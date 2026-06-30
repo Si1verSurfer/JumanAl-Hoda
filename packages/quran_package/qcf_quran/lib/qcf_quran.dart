@@ -11,6 +11,7 @@
 import 'src/data/page_data.dart';
 import 'src/data/juzs.dart';
 import 'src/data/suwar.dart';
+import 'src/data/surah_names_tashkeel.dart';
 import 'src/data/quran_text.dart';
 export 'src/qcf_verse.dart';
 export 'src/qcf_verses.dart';
@@ -104,6 +105,14 @@ String getSurahNameArabic(int surahNumber) {
     throw "No Surah found with given surahNumber";
   }
   return surah[surahNumber - 1]['arabic'].toString();
+}
+
+/// Takes [surahNumber] and returns the Surah name in Arabic with diacritics (تشكيل).
+String getSurahNameArabicWithTashkeel(int surahNumber) {
+  if (surahNumber > 114 || surahNumber <= 0) {
+    throw "No Surah found with given surahNumber";
+  }
+  return surahNamesTashkeel[surahNumber - 1];
 }
 
 ///Takes [surahNumber], [verseNumber] and returns the page number of the Quran

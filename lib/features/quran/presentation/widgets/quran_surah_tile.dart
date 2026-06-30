@@ -18,7 +18,7 @@ class QuranSurahTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final nameArabic = getSurahNameArabic(surahNumber);
+    final nameArabic = getSurahNameArabicWithTashkeel(surahNumber);
     final verseCount = getVerseCount(surahNumber);
     final place = quranPlaceLabelArabic(getPlaceOfRevelation(surahNumber));
 

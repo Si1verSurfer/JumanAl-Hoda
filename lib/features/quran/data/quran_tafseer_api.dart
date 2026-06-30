@@ -2,27 +2,21 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-class AyahTafseer {
-  const AyahTafseer({
-    required this.text,
-    required this.resourceName,
-    required this.verseKey,
-  });
+import 'models/ayah_tafseer.dart';
 
-  final String text;
-  final String resourceName;
-  final String verseKey;
-}
+export 'models/ayah_tafseer.dart';
 
 abstract final class QuranTafseerApi {
   static const _baseUrl = 'https://api.qurancdn.com/api/qdc/tafsirs';
-  static const _tafsirSlug = 'ar-tafsir-muyassar';
 
   static Future<AyahTafseer> fetchAyahTafseer({
     required int surahNumber,
     required int verseNumber,
+    required String tafsirSlug,
   }) async {
-    final uri = Uri.parse('$_baseUrl/$_tafsirSlug/by_ayah/$surahNumber:$verseNumber');
+    final uri = Uri.parse(
+      '$_baseUrl/$tafsirSlug/by_ayah/$surahNumber:$verseNumber',
+    );
     final response = await http.get(uri);
 
     if (response.statusCode != 200) {
@@ -37,27 +31,18 @@ abstract final class QuranTafseerApi {
       throw const QuranTafseerException('لا يتوفر تفسير لهذه الآية.');
     }
 
-    final text = _stripHtml(tafsir['text']?.toString() ?? '').trim();
-    if (text.isEmpty) {
+    final rawHtml = tafsir['text']?.toString() ?? '';
+    if (rawHtml.trim().isEmpty) {
       throw const QuranTafseerException('لا يتوفر تفسير لهذه الآية.');
     }
 
     return AyahTafseer(
-      text: text,
-      resourceName: tafsir['resource_name']?.toString() ?? 'التفسير الميسر',
+      text: rawHtml,
+      resourceName: tafsir['resource_name']?.toString() ?? '',
       verseKey: '$surahNumber:$verseNumber',
+      bookSlug: tafsirSlug,
+      cachedAt: 0,
     );
-  }
-
-  static String _stripHtml(String input) {
-    return input
-        .replaceAll(RegExp(r'<[^>]*>'), '')
-        .replaceAll('&nbsp;', ' ')
-        .replaceAll('&amp;', '&')
-        .replaceAll('&lt;', '<')
-        .replaceAll('&gt;', '>')
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .trim();
   }
 }
 

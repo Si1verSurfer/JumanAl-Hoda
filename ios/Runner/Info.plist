@@ -70,5 +70,9 @@
 	<false/>
 	<key>FLTEnableImpeller</key>
 	<true/>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>يُستخدم هذا الإذن لحفظ بطاقات الآيات في مكتبة الصور على جهازك.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>يُستخدم هذا الإذن لحفظ بطاقات الآيات في مكتبة الصور على جهازك.</string>
 </dict>
 </plist>

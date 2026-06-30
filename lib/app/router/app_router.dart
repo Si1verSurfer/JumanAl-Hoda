@@ -55,8 +55,14 @@ final routerProvider = Provider<GoRouter>((ref) {
                             state.uri.queryParameters['page'] ?? '',
                           ) ??
                           1;
+                      final flashSurah =
+                          int.tryParse(state.uri.queryParameters['surah'] ?? '');
+                      final flashVerse =
+                          int.tryParse(state.uri.queryParameters['verse'] ?? '');
                       return QuranReaderScreen(
                         initialPageNumber: page.clamp(1, 604),
+                        flashAyahSurah: flashSurah,
+                        flashAyahVerse: flashVerse,
                       );
                     },
                   ),

@@ -11,6 +11,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/platform_utils.dart';
 import '../providers/quran_reading_provider.dart';
 import '../widgets/quran_continue_card.dart';
+import '../widgets/quran_saved_ayahs_panel.dart';
 import '../widgets/quran_surah_tile.dart';
 
 class QuranScreen extends ConsumerWidget {
@@ -18,6 +19,13 @@ class QuranScreen extends ConsumerWidget {
 
   void _openReader(BuildContext context, int pageNumber) {
     context.push('${Routes.quran}/read?page=$pageNumber');
+  }
+
+  void _openAyah(BuildContext context, int surahNumber, int verseNumber) {
+    final page = getPageNumber(surahNumber, verseNumber);
+    context.push(
+      '${Routes.quran}/read?page=$page&surah=$surahNumber&verse=$verseNumber',
+    );
   }
 
   @override
@@ -62,6 +70,11 @@ class QuranScreen extends ConsumerWidget {
                 QuranContinueCard(
                   pageNumber: lastPage,
                   onTap: () => _openReader(context, lastPage),
+                ),
+                const SizedBox(height: 20),
+                QuranSavedAyahsPanel(
+                  isDark: isDark,
+                  onOpenAyah: (surah, verse) => _openAyah(context, surah, verse),
                 ),
                 const SizedBox(height: 24),
                 Row(
