@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:qcf_quran/qcf_quran.dart';
 
+import '../../../../core/haptics/goman_haptics.dart';
+import '../../../../core/navigation/goman_navigation.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/models/ayah_card.dart';
 import '../../data/models/ayah_highlight.dart';
@@ -16,7 +18,7 @@ Future<void> showQuranAyahActionsSheet(
   required int verseNumber,
   required VoidCallback onOpenTafseer,
 }) {
-  return showModalBottomSheet<void>(
+  return showGomanModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
@@ -179,6 +181,7 @@ class _QuranAyahActionsSheet extends ConsumerWidget {
                   const SizedBox(height: 10),
                   TextButton(
                     onPressed: () async {
+                      GomanHaptics.tap();
                       await ref
                           .read(quranAyahHighlightsProvider.notifier)
                           .removeHighlight(
@@ -251,7 +254,7 @@ class _HighlightColorButton extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: onTap,
+        onTap: onTap.withHaptic(GomanHapticKind.tap),
         borderRadius: BorderRadius.circular(14),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
@@ -316,7 +319,7 @@ class _ActionTile extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: onTap,
+          onTap: onTap.withHaptic(GomanHapticKind.tap),
           borderRadius: BorderRadius.circular(14),
           child: Ink(
             decoration: BoxDecoration(

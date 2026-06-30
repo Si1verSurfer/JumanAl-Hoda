@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:qcf_quran/qcf_quran.dart';
 
+import '../../../../core/navigation/goman_navigation.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/quran_tafseer_api.dart';
 import '../../data/quran_tafseer_books.dart';
@@ -17,7 +18,7 @@ Future<void> showQuranAyahTafseerSheet(
   required int surahNumber,
   required int verseNumber,
 }) {
-  return showModalBottomSheet<void>(
+  return showGomanModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,

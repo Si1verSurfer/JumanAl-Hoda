@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/motion/goman_page_transitions.dart';
 import '../../features/adhkar/presentation/screens/adhkar_screen.dart';
 import '../../features/duas/presentation/screens/duas_screen.dart';
 import '../../features/prayer_times/presentation/screens/prayer_times_screen.dart';
+import '../../features/quran/presentation/screens/quran_saved_ayahs_screen.dart';
 import '../../features/quran/presentation/screens/quran_reader_screen.dart';
 import '../../features/quran/presentation/screens/quran_screen.dart';
 import '../../features/shell/presentation/shell_screen.dart';
@@ -48,9 +50,17 @@ final routerProvider = Provider<GoRouter>((ref) {
                 ),
                 routes: [
                   GoRoute(
+                    path: 'saved',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    pageBuilder: (context, state) => GomanPageTransitions.push(
+                      key: state.pageKey,
+                      child: const QuranSavedAyahsScreen(),
+                    ),
+                  ),
+                  GoRoute(
                     path: 'read',
                     parentNavigatorKey: _rootNavigatorKey,
-                    builder: (context, state) {
+                    pageBuilder: (context, state) {
                       final page = int.tryParse(
                             state.uri.queryParameters['page'] ?? '',
                           ) ??
@@ -59,10 +69,13 @@ final routerProvider = Provider<GoRouter>((ref) {
                           int.tryParse(state.uri.queryParameters['surah'] ?? '');
                       final flashVerse =
                           int.tryParse(state.uri.queryParameters['verse'] ?? '');
-                      return QuranReaderScreen(
-                        initialPageNumber: page.clamp(1, 604),
-                        flashAyahSurah: flashSurah,
-                        flashAyahVerse: flashVerse,
+                      return GomanPageTransitions.reader(
+                        key: state.pageKey,
+                        child: QuranReaderScreen(
+                          initialPageNumber: page.clamp(1, 604),
+                          flashAyahSurah: flashSurah,
+                          flashAyahVerse: flashVerse,
+                        ),
                       );
                     },
                   ),

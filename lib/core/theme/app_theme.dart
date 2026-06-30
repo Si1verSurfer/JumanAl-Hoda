@@ -46,7 +46,7 @@ abstract final class AppTheme {
         titleTextStyle: AppTextStyles.textTheme(isDark: isDark).titleLarge,
       ),
       cardTheme: CardThemeData(
-        color: isDark ? AppColors.surfaceDarkElevated : AppColors.surfaceLight,
+        color: isDark ? AppColors.surfaceDarkElevated : AppColors.surfaceElevatedLight,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
@@ -75,7 +75,7 @@ abstract final class AppTheme {
       navigationBarTheme: NavigationBarThemeData(
         height: AppNavConstants.barHeight,
         backgroundColor:
-            isDark ? AppColors.surfaceDarkElevated : AppColors.surfaceLight,
+            isDark ? AppColors.surfaceDarkElevated : AppColors.surfaceElevatedLight,
         indicatorColor: AppColors.secondary.withValues(alpha: 0.18),
         labelPadding: const EdgeInsets.only(top: 2),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {

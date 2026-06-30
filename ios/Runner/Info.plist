@@ -74,5 +74,16 @@
 	<string>يُستخدم هذا الإذن لحفظ بطاقات الآيات في مكتبة الصور على جهازك.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>يُستخدم هذا الإذن لحفظ بطاقات الآيات في مكتبة الصور على جهازك.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>يُستخدم موقعك لحساب مواقيت الصلاة بدقة حسب مدينتك.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>processing</string>
+	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>jumanahjumanalhoda.com.prayerMidnightRefresh</string>
+	</array>
 </dict>
 </plist>

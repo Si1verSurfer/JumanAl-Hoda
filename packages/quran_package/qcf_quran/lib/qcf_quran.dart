@@ -10,6 +10,7 @@
 ///
 import 'src/data/page_data.dart';
 import 'src/data/juzs.dart';
+import 'src/data/quarters.dart';
 import 'src/data/suwar.dart';
 import 'src/data/surah_names_tashkeel.dart';
 import 'src/data/quran_text.dart';
@@ -18,6 +19,7 @@ export 'src/qcf_verses.dart';
 export 'src/data/page_font_size.dart';
 export 'src/helpers/convert_to_arabic_number.dart';
 export 'src/quran_pageview.dart';
+export 'src/qcf_header_frame_image.dart';
 export 'src/header_widget.dart';
 export 'src/qcf_page.dart';
 export 'src/qcf_theme_data.dart';
@@ -41,6 +43,9 @@ const int totalMadaniSurahs = 25;
 
 ///The constant total juz count
 const int totalJuzCount = 30;
+
+///The constant total hizb count (each juz has two hizbs).
+const int totalHizbCount = 60;
 
 ///The constant total surah count
 const int totalSurahCount = 114;
@@ -81,6 +86,83 @@ int getJuzNumber(int surahNumber, int verseNumber) {
     }
   }
   return -1;
+}
+
+/// Returns the mushaf page where [juzNumber] (1–30) begins.
+int getJuzStartPage(int juzNumber) {
+  if (juzNumber < 1 || juzNumber > totalJuzCount) {
+    throw "Invalid juz number. Juz number must be between 1 and $totalJuzCount";
+  }
+  final data = juz[juzNumber - 1];
+  final surahs = data['surahs'] as List;
+  final firstSurah = int.parse(surahs.first.toString());
+  final verseRange = data['verses'][firstSurah] as List;
+  final firstVerse = int.parse(verseRange.first.toString());
+  return getPageNumber(firstSurah, firstVerse);
+}
+
+int _ayahCompare(int surahA, int verseA, int surahB, int verseB) {
+  if (surahA != surahB) return surahA.compareTo(surahB);
+  return verseA.compareTo(verseB);
+}
+
+/// Surah numbers that appear in [juzNumber] (1–30).
+List<int> getSurahsInJuz(int juzNumber) {
+  if (juzNumber < 1 || juzNumber > totalJuzCount) {
+    return const [];
+  }
+  final data = juz[juzNumber - 1];
+  final verses = data['verses'] as Map;
+  final surahs = verses.keys
+      .map((key) => int.parse(key.toString()))
+      .toList(growable: false);
+  surahs.sort();
+  return surahs;
+}
+
+/// Surah numbers that overlap [hizbNumber] (1–60).
+List<int> getSurahsInHizb(int hizbNumber) {
+  if (hizbNumber < 1 || hizbNumber > totalHizbCount) {
+    return const [];
+  }
+
+  final startQuarter = quarters[(hizbNumber - 1) * 4];
+  final startSurah = int.parse(startQuarter['surah'].toString());
+  final startVerse = int.parse(startQuarter['ayah'].toString());
+
+  final int endSurah;
+  final int endVerse;
+  if (hizbNumber >= totalHizbCount) {
+    endSurah = totalSurahCount;
+    endVerse = getVerseCount(totalSurahCount) + 1;
+  } else {
+    final endQuarter = quarters[hizbNumber * 4];
+    endSurah = int.parse(endQuarter['surah'].toString());
+    endVerse = int.parse(endQuarter['ayah'].toString());
+  }
+
+  final surahs = <int>[];
+  for (var surah = 1; surah <= totalSurahCount; surah++) {
+    final lastVerse = getVerseCount(surah);
+    final overlaps = _ayahCompare(surah, lastVerse, startSurah, startVerse) >= 0 &&
+        _ayahCompare(surah, 1, endSurah, endVerse) < 0;
+    if (overlaps) surahs.add(surah);
+  }
+  return surahs;
+}
+
+/// First surah and verse on a mushaf [pageNumber] (1–604).
+(int, int) getPrimaryAyahForPage(int pageNumber) {
+  if (pageNumber < 1 || pageNumber > totalPagesCount) {
+    throw "Invalid page number. Page number must be between 1 and $totalPagesCount";
+  }
+  final ranges = getPageData(pageNumber);
+  if (ranges.isEmpty) return (1, 1);
+  final first = ranges.first;
+  return (
+    int.parse(first['surah'].toString()),
+    int.parse(first['start'].toString()),
+  );
 }
 
 ///Takes [surahNumber] and returns the Surah name

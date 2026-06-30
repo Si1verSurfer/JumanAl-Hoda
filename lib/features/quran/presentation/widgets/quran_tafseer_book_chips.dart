@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/haptics/goman_haptics.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/quran_tafseer_books.dart';
 
@@ -63,7 +64,7 @@ class QuranTafseerBookChips extends StatelessWidget {
                   label: book.nameArabic,
                   selected: book.slug == selectedSlug,
                   isDark: isDark,
-                  onTap: () => onSelected(book),
+                  onTap: (() => onSelected(book)).withHaptic(GomanHapticKind.tap),
                 );
               },
             ),

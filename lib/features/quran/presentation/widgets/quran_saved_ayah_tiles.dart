@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:qcf_quran/qcf_quran.dart';
 
+import '../../../../core/haptics/goman_haptics.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/models/ayah_card.dart';
 import '../../data/models/ayah_highlight.dart';
@@ -136,7 +137,7 @@ class _QuranAyahCardTileState extends ConsumerState<QuranAyahCardTile> {
               Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  onTap: widget.onTap,
+                  onTap: widget.onTap.withHaptic(),
                   borderRadius: BorderRadius.circular(18),
                   child: Ink(
                     decoration: BoxDecoration(
@@ -237,21 +238,21 @@ class _QuranAyahCardTileState extends ConsumerState<QuranAyahCardTile> {
                         label: 'حفظ',
                         isDark: isDark,
                         loading: _savingToGallery,
-                        onTap: _saveToGallery,
+                        onTap: _saveToGallery.withHaptic(GomanHapticKind.tap),
                       ),
                       _footerDivider(isDark),
                       _CardFooterAction(
                         icon: Icons.menu_book_rounded,
                         label: 'فتح',
                         isDark: isDark,
-                        onTap: widget.onTap,
+                        onTap: widget.onTap.withHaptic(),
                       ),
                       _footerDivider(isDark),
                       _CardFooterAction(
                         icon: Icons.delete_outline_rounded,
                         label: 'حذف',
                         isDark: isDark,
-                        onTap: widget.onRemove,
+                        onTap: widget.onRemove.withHaptic(GomanHapticKind.tap),
                       ),
                     ],
                   ),
@@ -381,7 +382,7 @@ class QuranAyahHighlightTile extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: onTap,
+          onTap: onTap.withHaptic(),
           borderRadius: BorderRadius.circular(16),
           child: Ink(
             decoration: BoxDecoration(

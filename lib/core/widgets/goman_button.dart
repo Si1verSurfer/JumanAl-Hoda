@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../haptics/goman_haptics.dart';
+
 enum GomanButtonVariant { filled, outlined }
 
 class GomanButton extends StatelessWidget {
@@ -18,11 +20,11 @@ class GomanButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return switch (variant) {
       GomanButtonVariant.filled => FilledButton(
-          onPressed: onPressed,
+          onPressed: onPressed?.withHaptic(GomanHapticKind.confirm),
           child: Text(label),
         ),
       GomanButtonVariant.outlined => OutlinedButton(
-          onPressed: onPressed,
+          onPressed: onPressed?.withHaptic(GomanHapticKind.tap),
           child: Text(label),
         ),
     };

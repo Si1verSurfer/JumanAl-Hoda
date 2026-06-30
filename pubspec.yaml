@@ -48,8 +48,18 @@ dependencies:
   path_provider: ^2.1.5
   gal: ^2.3.1
   share_plus: ^10.1.4
+  adhan: ^2.0.0+1
+  hijri: ^3.0.0
+  geolocator: ^13.0.2
+  geocoding: ^3.0.0
+  permission_handler: ^11.3.1
+  intl: ^0.20.2
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.10.0
+  workmanager: ^0.5.2
   qcf_quran:
     path: packages/quran_package/qcf_quran
+  flutter_timezone: ^5.1.0
 
 dev_dependencies:
   flutter_test:

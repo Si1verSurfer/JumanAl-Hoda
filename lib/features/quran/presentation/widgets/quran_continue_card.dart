@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:qcf_quran/qcf_quran.dart';
 
+import '../../../../core/haptics/goman_haptics.dart';
 import '../../../../core/theme/app_colors.dart';
+import 'quran_rtl_icons.dart';
 
 class QuranContinueCard extends StatelessWidget {
   const QuranContinueCard({
@@ -19,12 +21,12 @@ class QuranContinueCard extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(18),
+        onTap: onTap.withHaptic(),
+        borderRadius: BorderRadius.circular(20),
         child: Ink(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            gradient: LinearGradient(
+            borderRadius: BorderRadius.circular(20),
+            gradient: const LinearGradient(
               begin: Alignment.topRight,
               end: Alignment.bottomLeft,
               colors: [
@@ -34,22 +36,25 @@ class QuranContinueCard extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.22),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
+                color: AppColors.primary.withValues(alpha: 0.24),
+                blurRadius: 22,
+                offset: const Offset(0, 10),
               ),
             ],
           ),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
+            padding: const EdgeInsets.fromLTRB(18, 18, 16, 18),
             child: Row(
               children: [
                 Container(
-                  width: 46,
-                  height: 46,
+                  width: 48,
+                  height: 48,
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.14),
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.12),
+                    ),
                   ),
                   child: const Icon(
                     Icons.menu_book_rounded,
@@ -65,27 +70,27 @@ class QuranContinueCard extends StatelessWidget {
                       Text(
                         'تابع القراءة',
                         style: GoogleFonts.notoNaskhArabic(
-                          fontSize: 17,
+                          fontSize: 18,
                           fontWeight: FontWeight.w700,
                           color: AppColors.onPrimary,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 4),
                       Text(
                         'صفحة ${convertToArabicNumber('$pageNumber')} من ${convertToArabicNumber('$totalPagesCount')}',
-                        style: GoogleFonts.notoNaskhArabic(
+                        style: GoogleFonts.tajawal(
                           fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.onPrimary.withValues(alpha: 0.82),
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.onPrimary.withValues(alpha: 0.84),
                         ),
                       ),
                     ],
                   ),
                 ),
-                Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  size: 18,
-                  color: AppColors.onPrimary.withValues(alpha: 0.9),
+                QuranRtlIcons.forwardIcon(
+                  size: 17,
+                  color: AppColors.onPrimary,
+                  opacity: 0.92,
                 ),
               ],
             ),

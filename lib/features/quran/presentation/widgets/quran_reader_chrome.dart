@@ -5,7 +5,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:qcf_quran/qcf_quran.dart';
 
+import '../../../../core/haptics/goman_haptics.dart';
 import '../../../../core/theme/app_colors.dart';
+import 'quran_index_grid_tiles.dart';
 
 abstract final class QuranReaderChrome {
   static const topBarHeight = 44.0;
@@ -17,28 +19,34 @@ abstract final class QuranReaderChrome {
 class QuranReaderTopBar extends StatelessWidget {
   const QuranReaderTopBar({
     super.key,
-    required this.surahName,
-    required this.onBack,
+    required this.surahNumber,
+    required this.onClose,
     required this.onSurahList,
     required this.onSearch,
-    required this.backIconAsset,
+    required this.onTheme,
     required this.searchIconAsset,
     required this.surahListIconAsset,
+    required this.barBackground,
+    required this.barTextColor,
+    required this.barAccentColor,
   });
 
-  final String surahName;
-  final VoidCallback onBack;
+  final int surahNumber;
+  final VoidCallback onClose;
   final VoidCallback onSurahList;
   final VoidCallback onSearch;
-  final String backIconAsset;
+  final VoidCallback onTheme;
   final String searchIconAsset;
   final String surahListIconAsset;
+  final Color barBackground;
+  final Color barTextColor;
+  final Color barAccentColor;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return _FrostedBar(
+      backgroundColor: barBackground,
+      borderColor: barAccentColor.withValues(alpha: 0.14),
       borderRadius: const BorderRadius.only(
         bottomLeft: Radius.circular(QuranReaderChrome.topBarBottomRadius),
         bottomRight: Radius.circular(QuranReaderChrome.topBarBottomRadius),
@@ -54,43 +62,58 @@ class QuranReaderTopBar extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Row(
-              children: [
-                QuranReaderActionButton(
-                  iconAsset: backIconAsset,
-                  tooltip: 'رجوع',
-                  onPressed: onBack,
-                ),
-                Expanded(
-                  child: Text(
-                    surahName,
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.notoNaskhArabic(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: isDark
-                          ? AppColors.surfaceLight
-                          : AppColors.primary,
+                children: [
+                  QuranReaderActionButton(
+                    icon: Icons.close_rounded,
+                    tooltip: 'العودة للقرآن',
+                    onPressed: onClose,
+                    variant: QuranReaderButtonVariant.secondary,
+                    accentColor: barAccentColor,
+                    surfaceColor: barBackground,
+                  ),
+                  Expanded(
+                    child: RichText(
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      text: TextSpan(
+                        text:
+                            'surah${surahNumber.toString().padLeft(3, '0')}',
+                        style: QuranSurahGridTileStyle.appBarSurahGlyph(
+                          barTextColor,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-                QuranReaderActionButton(
-                  iconAsset: searchIconAsset,
-                  tooltip: 'بحث',
-                  onPressed: onSearch,
-                  variant: QuranReaderButtonVariant.secondary,
-                ),
-                const SizedBox(width: 6),
-                QuranReaderActionButton(
-                  iconAsset: surahListIconAsset,
-                  tooltip: 'فهرس السور',
-                  onPressed: onSurahList,
-                ),
-              ],
+                  QuranReaderActionButton(
+                    iconAsset: searchIconAsset,
+                    tooltip: 'بحث',
+                    onPressed: onSearch,
+                    variant: QuranReaderButtonVariant.secondary,
+                    accentColor: barAccentColor,
+                    surfaceColor: barBackground,
+                  ),
+                  const SizedBox(width: 6),
+                  QuranReaderActionButton(
+                    icon: Icons.palette_outlined,
+                    tooltip: 'مظهر المصحف',
+                    onPressed: onTheme,
+                    variant: QuranReaderButtonVariant.secondary,
+                    accentColor: barAccentColor,
+                    surfaceColor: barBackground,
+                  ),
+                  const SizedBox(width: 6),
+                  QuranReaderActionButton(
+                    iconAsset: surahListIconAsset,
+                    tooltip: 'فهرس السور',
+                    onPressed: onSurahList,
+                    accentColor: barAccentColor,
+                    onAccentColor: barBackground,
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
         ),
       ),
     );
@@ -151,21 +174,31 @@ enum QuranReaderButtonVariant { primary, secondary }
 class QuranReaderActionButton extends StatelessWidget {
   const QuranReaderActionButton({
     super.key,
-    required this.iconAsset,
+    this.iconAsset,
+    this.icon,
     required this.tooltip,
     required this.onPressed,
     this.variant = QuranReaderButtonVariant.primary,
-  });
+    this.accentColor = AppColors.secondary,
+    this.onAccentColor = AppColors.onPrimary,
+    this.surfaceColor,
+  }) : assert(iconAsset != null || icon != null);
 
-  final String iconAsset;
+  final String? iconAsset;
+  final IconData? icon;
   final String tooltip;
   final VoidCallback onPressed;
   final QuranReaderButtonVariant variant;
+  final Color accentColor;
+  final Color onAccentColor;
+  final Color? surfaceColor;
 
   @override
   Widget build(BuildContext context) {
     final isPrimary = variant == QuranReaderButtonVariant.primary;
-    final iconColor = isPrimary ? AppColors.onPrimary : AppColors.secondary;
+    final iconColor = isPrimary ? onAccentColor : accentColor;
+    final secondarySurface =
+        (surfaceColor ?? AppColors.surfaceLight).withValues(alpha: 0.72);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
@@ -174,7 +207,11 @@ class QuranReaderActionButton extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: onPressed,
+            onTap: onPressed.withHaptic(
+              icon == Icons.close_rounded
+                  ? GomanHapticKind.success
+                  : GomanHapticKind.tap,
+            ),
             borderRadius: BorderRadius.circular(11),
             child: Ink(
               width: 36,
@@ -182,35 +219,34 @@ class QuranReaderActionButton extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(11),
                 gradient: isPrimary
-                    ? const LinearGradient(
+                    ? LinearGradient(
                         begin: Alignment.topRight,
                         end: Alignment.bottomLeft,
-                        colors: [AppColors.secondary, AppColors.primary],
+                        colors: [accentColor, accentColor.withValues(alpha: 0.82)],
                       )
                     : null,
-                color: isPrimary
-                    ? null
-                    : AppColors.surfaceLight.withValues(alpha: 0.72),
+                color: isPrimary ? null : secondarySurface,
                 border: Border.all(
-                  color: isPrimary
-                      ? AppColors.primary.withValues(alpha: 0.35)
-                      : AppColors.secondary.withValues(alpha: 0.35),
+                  color: accentColor.withValues(alpha: isPrimary ? 0.35 : 0.28),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.14),
+                    color: accentColor.withValues(alpha: 0.12),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
                 ],
               ),
               child: Center(
-                child: SvgPicture.asset(
-                  iconAsset,
-                  width: 19,
-                  height: 19,
-                  colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
-                ),
+                child: icon != null
+                    ? Icon(icon, size: 20, color: iconColor)
+                    : SvgPicture.asset(
+                        iconAsset!,
+                        width: 19,
+                        height: 19,
+                        colorFilter:
+                            ColorFilter.mode(iconColor, BlendMode.srcIn),
+                      ),
               ),
             ),
           ),
@@ -225,16 +261,24 @@ class _FrostedBar extends StatelessWidget {
     required this.child,
     this.edge = _FrostedBarEdge.bottom,
     this.borderRadius,
+    this.backgroundColor,
+    this.borderColor,
   });
 
   final Widget child;
   final _FrostedBarEdge edge;
   final BorderRadius? borderRadius;
+  final Color? backgroundColor;
+  final Color? borderColor;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final borderColor = AppColors.primary.withValues(alpha: 0.06);
+    final fill = backgroundColor ??
+        (isDark ? AppColors.surfaceDark : AppColors.glassLight)
+            .withValues(alpha: 0.9);
+    final stroke =
+        borderColor ?? AppColors.primary.withValues(alpha: 0.06);
     final radius = borderRadius ?? BorderRadius.zero;
 
     return ClipRRect(
@@ -243,15 +287,14 @@ class _FrostedBar extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: (isDark ? AppColors.surfaceDark : AppColors.glassLight)
-                .withValues(alpha: 0.9),
+            color: fill,
             borderRadius: radius,
             border: Border(
               top: edge == _FrostedBarEdge.top
-                  ? BorderSide(color: borderColor)
+                  ? BorderSide(color: stroke)
                   : BorderSide.none,
               bottom: edge == _FrostedBarEdge.bottom
-                  ? BorderSide(color: borderColor)
+                  ? BorderSide(color: stroke)
                   : BorderSide.none,
             ),
           ),

@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:qcf_quran/qcf_quran.dart';
 
+import '../../../../core/navigation/goman_navigation.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../utils/quran_search_parser.dart';
+import 'quran_search_field.dart';
+import 'quran_search_result_tile.dart';
 
 typedef QuranSearchNavigate = void Function(int surahNumber, int verseNumber);
 
@@ -11,7 +14,7 @@ Future<void> showQuranSearchSheet(
   BuildContext context, {
   required QuranSearchNavigate onNavigate,
 }) {
-  return showModalBottomSheet<void>(
+  return showGomanModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
@@ -123,61 +126,11 @@ class _QuranSearchSheetState extends State<_QuranSearchSheet> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    TextField(
+                    QuranSearchField(
                       controller: _controller,
                       focusNode: _focusNode,
-                      textAlign: TextAlign.right,
-                      style: GoogleFonts.notoNaskhArabic(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: isDark
-                            ? AppColors.surfaceLight
-                            : AppColors.primary,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: 'اسم السورة أو رقم الآية',
-                        hintStyle: GoogleFonts.notoNaskhArabic(
-                          fontSize: 15,
-                          color: AppColors.primary.withValues(alpha: 0.4),
-                        ),
-                        prefixIcon: Icon(
-                          Icons.search_rounded,
-                          color: AppColors.secondary.withValues(alpha: 0.8),
-                        ),
-                        suffixIcon: query.isEmpty
-                            ? null
-                            : IconButton(
-                                onPressed: () => _controller.clear(),
-                                icon: Icon(
-                                  Icons.close_rounded,
-                                  color: AppColors.secondary
-                                      .withValues(alpha: 0.75),
-                                ),
-                              ),
-                        filled: true,
-                        fillColor: isDark
-                            ? AppColors.surfaceDarkElevated
-                            : AppColors.glassLight,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide(
-                            color: AppColors.secondary.withValues(alpha: 0.25),
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide(
-                            color: AppColors.primary.withValues(alpha: 0.1),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: const BorderSide(
-                            color: AppColors.secondary,
-                            width: 1.4,
-                          ),
-                        ),
-                      ),
+                      isDark: isDark,
+                      hintText: 'اسم السورة أو رقم الآية',
                     ),
                   ],
                 ),
@@ -203,9 +156,9 @@ class _QuranSearchSheetState extends State<_QuranSearchSheet> {
 
     final direct = _results.directAyah;
     if (direct != null) {
-      sections.add(_SectionTitle('انتقال مباشر', isDark: isDark));
+      sections.add(QuranSearchSectionTitle(label: 'انتقال مباشر', isDark: isDark));
       sections.add(
-        _SearchResultTile(
+        QuranSearchResultTile(
           isDark: isDark,
           title:
               '${getSurahNameArabic(direct.surahNumber)} · ${convertToArabicNumber('${direct.surahNumber}')}:${convertToArabicNumber('${direct.verseNumber}')}',
@@ -220,11 +173,11 @@ class _QuranSearchSheetState extends State<_QuranSearchSheet> {
     }
 
     if (_results.surahs.isNotEmpty) {
-      sections.add(_SectionTitle('السور', isDark: isDark));
+      sections.add(QuranSearchSectionTitle(label: 'السور', isDark: isDark));
       for (final match in _results.surahs.take(20)) {
         final n = match.surahNumber;
         sections.add(
-          _SearchResultTile(
+          QuranSearchResultTile(
             isDark: isDark,
             title: getSurahNameArabic(n),
             subtitle:
@@ -237,12 +190,14 @@ class _QuranSearchSheetState extends State<_QuranSearchSheet> {
     }
 
     if (_results.ayahTextMatches.isNotEmpty) {
-      sections.add(_SectionTitle('نتائج في آيات القرآن', isDark: isDark));
+      sections.add(
+        QuranSearchSectionTitle(label: 'نتائج في آيات القرآن', isDark: isDark),
+      );
       for (final match in _results.ayahTextMatches.take(30)) {
         final s = match.surahNumber;
         final v = match.verseNumber;
         sections.add(
-          _SearchResultTile(
+          QuranSearchResultTile(
             isDark: isDark,
             title:
                 '${getSurahNameArabic(s)} · ${convertToArabicNumber('$s')}:${convertToArabicNumber('$v')}',
@@ -301,113 +256,6 @@ class _EmptySearchHint extends StatelessWidget {
             height: 1.7,
             color: (isDark ? AppColors.surfaceLight : AppColors.primary)
                 .withValues(alpha: 0.5),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SectionTitle extends StatelessWidget {
-  const _SectionTitle(this.label, {required this.isDark});
-
-  final String label;
-  final bool isDark;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8, top: 4),
-      child: Text(
-        label,
-        style: GoogleFonts.notoNaskhArabic(
-          fontSize: 13,
-          fontWeight: FontWeight.w700,
-          color: AppColors.secondary,
-        ),
-      ),
-    );
-  }
-}
-
-class _SearchResultTile extends StatelessWidget {
-  const _SearchResultTile({
-    required this.isDark,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  final bool isDark;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(14),
-          child: Ink(
-            decoration: BoxDecoration(
-              color: isDark
-                  ? AppColors.surfaceDarkElevated
-                  : AppColors.glassLight,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: AppColors.primary.withValues(
-                  alpha: isDark ? 0.14 : 0.08,
-                ),
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: GoogleFonts.notoNaskhArabic(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: isDark
-                                ? AppColors.surfaceLight
-                                : AppColors.primary,
-                          ),
-                        ),
-                        if (subtitle.isNotEmpty) ...[
-                          const SizedBox(height: 4),
-                          Text(
-                            subtitle,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.notoNaskhArabic(
-                              fontSize: 13,
-                              height: 1.5,
-                              color: (isDark
-                                      ? AppColors.surfaceLight
-                                      : AppColors.primary)
-                                  .withValues(alpha: 0.58),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                  Icon(
-                    Icons.chevron_left_rounded,
-                    color: AppColors.secondary.withValues(alpha: 0.75),
-                  ),
-                ],
-              ),
-            ),
           ),
         ),
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/haptics/goman_haptics.dart';
 import '../../../core/utils/platform_utils.dart';
 import '../../../core/widgets/goman_ambient_background.dart';
 import 'providers/nav_index_provider.dart';
@@ -17,6 +18,9 @@ class ShellScreen extends ConsumerWidget {
   final StatefulNavigationShell navigationShell;
 
   void _onTabTap(int index, WidgetRef ref) {
+    if (index != navigationShell.currentIndex) {
+      GomanHaptics.confirm();
+    }
     ref.read(navIndexProvider.notifier).state = index;
     navigationShell.goBranch(
       index,

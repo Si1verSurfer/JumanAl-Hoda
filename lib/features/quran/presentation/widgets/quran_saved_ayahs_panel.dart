@@ -3,148 +3,118 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:qcf_quran/qcf_quran.dart';
 
+import '../../../../core/haptics/goman_haptics.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/models/ayah_card.dart';
 import '../../data/models/ayah_highlight.dart';
 import '../providers/quran_ayah_cards_provider.dart';
 import '../providers/quran_ayah_highlights_provider.dart';
+import 'quran_rtl_icons.dart';
 import 'quran_saved_ayah_tiles.dart';
 
-class QuranSavedAyahsPanel extends ConsumerStatefulWidget {
-  const QuranSavedAyahsPanel({
+/// Tappable summary card on the Quran tab — opens [QuranSavedAyahsScreen].
+class QuranSavedAyahsEntryCard extends ConsumerWidget {
+  const QuranSavedAyahsEntryCard({
     super.key,
     required this.isDark,
-    required this.onOpenAyah,
+    required this.onTap,
   });
 
   final bool isDark;
-  final void Function(int surahNumber, int verseNumber) onOpenAyah;
+  final VoidCallback onTap;
 
   @override
-  ConsumerState<QuranSavedAyahsPanel> createState() =>
-      _QuranSavedAyahsPanelState();
-}
-
-class _QuranSavedAyahsPanelState extends ConsumerState<QuranSavedAyahsPanel>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    _tabController.addListener(() {
-      if (!_tabController.indexIsChanging) setState(() {});
-    });
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = widget.isDark;
+  Widget build(BuildContext context, WidgetRef ref) {
     final cards = ref.watch(quranAyahCardsProvider);
     final highlights = ref.watch(quranAyahHighlightsProvider);
+    final total = cards.length + highlights.length;
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDarkElevated : AppColors.glassLight,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppColors.primary.withValues(alpha: isDark ? 0.14 : 0.07),
-        ),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: AppColors.cardShadow(isDark: isDark),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-            child: Text(
-              'آياتي المحفوظة',
-              style: GoogleFonts.notoNaskhArabic(
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-                color: isDark ? AppColors.surfaceLight : AppColors.primary,
-              ),
-            ),
-          ),
-          TabBar(
-            controller: _tabController,
-            labelColor: AppColors.secondary,
-            unselectedLabelColor:
-                (isDark ? AppColors.surfaceLight : AppColors.primary)
-                    .withValues(alpha: 0.5),
-            indicatorColor: AppColors.secondary,
-            indicatorSize: TabBarIndicatorSize.label,
-            dividerColor: AppColors.secondary.withValues(alpha: 0.1),
-            labelStyle: GoogleFonts.tajawal(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-            ),
-            unselectedLabelStyle: GoogleFonts.tajawal(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
-            tabs: [
-              Tab(text: 'البطاقات (${convertToArabicNumber('${cards.length}')})'),
-              Tab(
-                text:
-                    'التظليلات (${convertToArabicNumber('${highlights.length}')})',
-              ),
-            ],
-          ),
-          SizedBox(
-            height: _panelHeight(cards.length, highlights.length),
-            child: TabBarView(
-              controller: _tabController,
+      child: Material(
+        color: AppColors.glassLight,
+        elevation: 0,
+        shadowColor: Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap.withHaptic(),
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 14, 16),
+            child: Row(
               children: [
-                _CardsTab(
-                  cards: cards,
-                  isDark: isDark,
-                  onOpenAyah: widget.onOpenAyah,
-                  onRemove: (cardId) {
-                    ref.read(quranAyahCardsProvider.notifier).removeCard(cardId);
-                  },
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topRight,
+                      end: Alignment.bottomLeft,
+                      colors: [
+                        AppColors.secondary.withValues(alpha: 0.16),
+                        AppColors.secondary.withValues(alpha: 0.06),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(
+                      color: AppColors.secondary.withValues(alpha: 0.18),
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.bookmarks_rounded,
+                    color: AppColors.secondary.withValues(alpha: 0.88),
+                    size: 22,
+                  ),
                 ),
-                _HighlightsTab(
-                  highlights: highlights,
-                  isDark: isDark,
-                  onOpenAyah: widget.onOpenAyah,
-                  onRemove: (surah, verse) {
-                    ref
-                        .read(quranAyahHighlightsProvider.notifier)
-                        .removeHighlight(
-                          surahNumber: surah,
-                          verseNumber: verse,
-                        );
-                  },
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'آياتي المحفوظة',
+                        style: GoogleFonts.notoNaskhArabic(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                          color: isDark
+                              ? AppColors.surfaceLight
+                              : AppColors.primary,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        total == 0
+                            ? 'البطاقات والتظليلات — اضغط للعرض'
+                            : '${convertToArabicNumber('${cards.length}')} بطاقة · ${convertToArabicNumber('${highlights.length}')} تظليل',
+                        style: GoogleFonts.tajawal(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: (isDark
+                                  ? AppColors.surfaceLight
+                                  : AppColors.primary)
+                              .withValues(alpha: 0.55),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+                QuranRtlIcons.forwardIcon(size: 15, opacity: 0.7),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
-
-  double _panelHeight(int cardCount, int highlightCount) {
-    final activeCount =
-        _tabController.index == 0 ? cardCount : highlightCount;
-    if (activeCount == 0) return 140;
-    if (_tabController.index == 0) {
-      return (activeCount * 260.0 + 24).clamp(200, 520);
-    }
-    return (activeCount * 96.0 + 24).clamp(160, 420);
-  }
 }
 
-class _CardsTab extends StatelessWidget {
-  const _CardsTab({
+class QuranSavedAyahsCardsTab extends StatelessWidget {
+  const QuranSavedAyahsCardsTab({
+    super.key,
     required this.cards,
     required this.isDark,
     required this.onOpenAyah,
@@ -159,7 +129,7 @@ class _CardsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (cards.isEmpty) {
-      return _EmptyTabMessage(
+      return QuranSavedAyahsEmptyMessage(
         isDark: isDark,
         message: 'لا توجد بطاقات بعد',
         hint: 'اضغط مطولاً على آية وأضفها إلى البطاقات (حتى ٣ آيات)',
@@ -182,8 +152,9 @@ class _CardsTab extends StatelessWidget {
   }
 }
 
-class _HighlightsTab extends StatelessWidget {
-  const _HighlightsTab({
+class QuranSavedAyahsHighlightsTab extends StatelessWidget {
+  const QuranSavedAyahsHighlightsTab({
+    super.key,
     required this.highlights,
     required this.isDark,
     required this.onOpenAyah,
@@ -198,7 +169,7 @@ class _HighlightsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (highlights.isEmpty) {
-      return _EmptyTabMessage(
+      return QuranSavedAyahsEmptyMessage(
         isDark: isDark,
         message: 'لا توجد تظليلات بعد',
         hint: 'اضغط مطولاً على آية واختر لون التظليل',
@@ -223,8 +194,9 @@ class _HighlightsTab extends StatelessWidget {
   }
 }
 
-class _EmptyTabMessage extends StatelessWidget {
-  const _EmptyTabMessage({
+class QuranSavedAyahsEmptyMessage extends StatelessWidget {
+  const QuranSavedAyahsEmptyMessage({
+    super.key,
     required this.isDark,
     required this.message,
     required this.hint,
@@ -238,30 +210,30 @@ class _EmptyTabMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(28),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.bookmark_border_rounded,
-              size: 28,
+              size: 32,
               color: AppColors.secondary.withValues(alpha: 0.45),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             Text(
               message,
               style: GoogleFonts.tajawal(
-                fontSize: 14,
+                fontSize: 15,
                 fontWeight: FontWeight.w700,
                 color: isDark ? AppColors.surfaceLight : AppColors.primary,
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             Text(
               hint,
               textAlign: TextAlign.center,
               style: GoogleFonts.tajawal(
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: FontWeight.w500,
                 height: 1.5,
                 color: (isDark ? AppColors.surfaceLight : AppColors.primary)

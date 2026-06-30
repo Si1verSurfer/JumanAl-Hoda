@@ -66,6 +66,18 @@ class QcfThemeData {
   /// Default: `null` (transparent)
   final Color? headerBackgroundColor;
 
+  /// Tint applied to [assets/mainframe.png] using [headerFrameBlendMode].
+  /// Default: `null` (original asset colors)
+  final Color? headerFrameColor;
+
+  /// Fill color for the center panel of the surah frame.
+  /// Defaults to [pageBackgroundColor] when null.
+  final Color? headerFrameCenterColor;
+
+  /// Blend mode used when tinting the surah frame image.
+  /// Default: [BlendMode.color]
+  final BlendMode headerFrameBlendMode;
+
   // ============ Spacing & Layout ============
 
   /// Horizontal padding for page content.
@@ -174,6 +186,9 @@ class QcfThemeData {
     this.verseBackgroundColor,
     this.verseNumberBackgroundColor,
     this.headerBackgroundColor,
+    this.headerFrameColor,
+    this.headerFrameCenterColor,
+    this.headerFrameBlendMode = BlendMode.modulate,
 
     // Spacing & Layout
     this.horizontalPadding = 12.0,
@@ -215,6 +230,9 @@ class QcfThemeData {
     Color? Function(int surahNumber, int verseNumber)? verseBackgroundColor,
     Color? verseNumberBackgroundColor,
     Color? headerBackgroundColor,
+    Color? headerFrameColor,
+    Color? headerFrameCenterColor,
+    BlendMode? headerFrameBlendMode,
     double? horizontalPadding,
     double? verticalPadding,
     double? verseHeight,
@@ -248,6 +266,11 @@ class QcfThemeData {
           verseNumberBackgroundColor ?? this.verseNumberBackgroundColor,
       headerBackgroundColor:
           headerBackgroundColor ?? this.headerBackgroundColor,
+      headerFrameColor: headerFrameColor ?? this.headerFrameColor,
+      headerFrameCenterColor:
+          headerFrameCenterColor ?? this.headerFrameCenterColor,
+      headerFrameBlendMode:
+          headerFrameBlendMode ?? this.headerFrameBlendMode,
       horizontalPadding: horizontalPadding ?? this.horizontalPadding,
       verticalPadding: verticalPadding ?? this.verticalPadding,
       verseHeight: verseHeight ?? this.verseHeight,
@@ -289,6 +312,7 @@ class QcfThemeData {
       basmalaColor: Color(0xFFE0E0E0),
       headerTextColor: Color(0xFFE0E0E0),
       pageBackgroundColor: Color(0xFF1E1E1E),
+      headerFrameColor: Color(0xFFC9A56A),
     );
   }
 
@@ -300,6 +324,7 @@ class QcfThemeData {
       basmalaColor: Color(0xFF3E2723),
       headerTextColor: Color(0xFF3E2723),
       pageBackgroundColor: Color(0xFFF5E6D3),
+      headerFrameColor: Color(0xFF8D6E4C),
     );
   }
 }

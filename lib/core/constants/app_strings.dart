@@ -22,4 +22,22 @@ abstract final class AppStrings {
   static const String duasSubtitle = 'مجموعة من الأدعية المأثورة';
   static const String prayerTimesSubtitle =
       'مواقيت الصلاة حسب موقعك';
+
+  static const String prayerFajr = 'الفجر';
+  static const String prayerSunrise = 'الشروق';
+  static const String prayerDhuhr = 'الظهر';
+  static const String prayerAsr = 'العصر';
+  static const String prayerMaghrib = 'المغرب';
+  static const String prayerIsha = 'العشاء';
+
+  static const String prayerNext = 'الصلاة القادمة';
+  static const String prayerHijriSuffix = 'هـ';
+  static const String prayerChangeLocation = 'تغيير الموقع';
+  static const String prayerUseMyLocation = 'استخدام موقعي';
+  static const String prayerLocationSearchHint = 'ابحث عن مدينة';
+  static const String prayerLocationDenied =
+      'لم يتم السماح بالموقع. اختر مدينة يدوياً.';
+  static const String prayerLoadingLocation = 'جاري تحديد الموقع…';
+  static const String prayerPopularCities = 'مدن شائعة';
+  static const String prayerRemaining = 'متبقٍ';
 }

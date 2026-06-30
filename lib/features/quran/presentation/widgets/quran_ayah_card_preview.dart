@@ -4,6 +4,7 @@ import 'package:qcf_quran/qcf_quran.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../constants/quran_app_assets.dart';
+import '../../data/models/quran_mushaf_theme.dart';
 import '../theme/quran_qcf_theme.dart';
 
 /// Mushaf-style ayah card using QCF page fonts — same rendering as the reader.
@@ -29,10 +30,10 @@ class QuranAyahCardPreview extends StatelessWidget {
               '${convertToArabicNumber('$surahNumber')}:${convertToArabicNumber('$verse')}',
         )
         .join('  ·  ');
-    final baseTheme = QuranQcfTheme.forBrightness(Brightness.light).copyWith(
+    final baseTheme = QuranQcfTheme.forMushafTheme(QuranMushafTheme.classic).copyWith(
       verseTextColor: AppColors.primary,
       verseNumberColor: AppColors.secondary,
-      pageBackgroundColor: AppColors.surfaceLight,
+      pageBackgroundColor: AppColors.mushafPaper,
       headerTextColor: AppColors.secondary,
       headerBackgroundColor: Colors.transparent,
       headerWidthSmall: width * 0.82,
@@ -51,7 +52,7 @@ class QuranAyahCardPreview extends StatelessWidget {
     return Container(
       width: width,
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.mushafPaper,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: AppColors.secondary.withValues(alpha: 0.12),
@@ -162,34 +163,40 @@ class _AyahCardSurahHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final frameWidth = width * 0.8;
+    final frameHeight = frameWidth / QcfHeaderFrameImage.aspectRatio;
+
     return Container(
       width: double.infinity,
       color: theme.headerBackgroundColor,
       padding: const EdgeInsets.only(top: 4, bottom: 2),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Image(
-            image: const AssetImage(
-              'assets/mainframe.png',
-              package: 'qcf_quran',
-            ),
-            width: width * 0.8,
-            fit: BoxFit.contain,
-          ),
-          RichText(
-            textAlign: TextAlign.center,
-            text: TextSpan(
-              text: 'surah${surahNumber.toString().padLeft(3, '0')}',
-              style: TextStyle(
-                fontFamily: SurahFontHelper.fontFamily,
-                package: 'qcf_quran',
-                fontSize: width * 0.058,
-                color: theme.headerTextColor,
+      child: Center(
+        child: SizedBox(
+          width: frameWidth,
+          height: frameHeight,
+          child: Stack(
+            alignment: Alignment.center,
+            clipBehavior: Clip.none,
+            children: [
+              QcfHeaderFrameImage(
+                width: frameWidth,
+                theme: theme,
               ),
-            ),
+              RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  text: 'surah${surahNumber.toString().padLeft(3, '0')}',
+                  style: TextStyle(
+                    fontFamily: SurahFontHelper.fontFamily,
+                    package: 'qcf_quran',
+                    fontSize: width * 0.058,
+                    color: QcfHeaderFrameImage.surahNameColor,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

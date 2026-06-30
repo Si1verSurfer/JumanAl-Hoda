@@ -22,7 +22,7 @@ class GomanCard extends StatelessWidget {
       width: width,
       padding: padding,
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDarkElevated : AppColors.surfaceLight,
+        color: isDark ? AppColors.surfaceDarkElevated : AppColors.surfaceElevatedLight,
         borderRadius: BorderRadius.circular(16),
         boxShadow: AppColors.cardShadow(isDark: isDark),
         border: Border.all(

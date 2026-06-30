@@ -6,12 +6,14 @@ import 'package:qcf_quran/qcf_quran.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../constants/quran_icon_assets.dart';
 import '../../data/models/ayah_highlight.dart';
+import '../../data/models/quran_mushaf_theme.dart';
 import '../providers/quran_ayah_highlights_provider.dart';
+import '../providers/quran_mushaf_theme_provider.dart';
 import '../providers/quran_reading_provider.dart';
-import '../theme/quran_qcf_theme.dart';
 import '../utils/ayah_highlight_colors.dart';
 import '../utils/quran_page_utils.dart';
 import '../widgets/quran_ayah_actions_sheet.dart';
+import '../widgets/quran_mushaf_theme_sheet.dart';
 import '../widgets/quran_reader_chrome.dart';
 import '../widgets/quran_search_sheet.dart';
 import '../widgets/quran_surah_list_sheet.dart';
@@ -132,7 +134,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
     final page = widget.initialPageNumber.clamp(1, totalPagesCount);
     _pageController = PageController(initialPage: page - 1);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(quranLastPageProvider.notifier).state = page;
+      ref.read(quranLastReadingProvider.notifier).updateFromPage(page);
       final flashSurah = widget.flashAyahSurah;
       final flashVerse = widget.flashAyahVerse;
       if (flashSurah != null && flashVerse != null) {
@@ -218,6 +220,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
     showQuranSurahListSheet(
       context,
       onSurahSelected: _jumpToSurah,
+      onAyahSelected: _jumpToAyahFromSearch,
     );
   }
 
@@ -233,6 +236,10 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
   void _jumpToAyahFromSearch(int surahNumber, int verseNumber) {
     _jumpToAyah(surahNumber, verseNumber);
     _flashAyahHighlight(surahNumber, verseNumber);
+  }
+
+  void _openMushafTheme() {
+    showQuranMushafThemeSheet(context);
   }
 
   void _openSearch() {
@@ -287,12 +294,13 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final theme = QuranQcfTheme.forBrightness(Theme.of(context).brightness);
+    final mushafThemeId = ref.watch(quranMushafThemeProvider);
+    final mushafSpec = QuranMushafThemes.specFor(mushafThemeId);
+    final theme = ref.watch(quranMushafQcfThemeProvider);
+    final isDarkMushaf = mushafSpec.isDarkBackground;
     final startPage = widget.initialPageNumber.clamp(1, totalPagesCount);
-    final currentPage = ref.watch(quranLastPageProvider);
+    final currentPage = ref.watch(quranLastReadingProvider).page;
     final currentSurah = getPrimarySurahForPage(currentPage);
-    final currentSurahName = getSurahNameArabic(currentSurah);
     final savedHighlights = ref.watch(quranAyahHighlightsProvider);
 
     return Scaffold(
@@ -310,15 +318,15 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
                 pageController: _pageController,
                 startPage: startPage,
                 theme: theme,
-                isDark: isDark,
+                isDark: isDarkMushaf,
                 verseBackgroundColor: (surah, verse) => _verseBackgroundColor(
                   surahNumber: surah,
                   verseNumber: verse,
-                  isDark: isDark,
+                  isDark: isDarkMushaf,
                   highlights: savedHighlights,
                 ),
                 onPageChanged: (page) {
-                  ref.read(quranLastPageProvider.notifier).state = page;
+                  ref.read(quranLastReadingProvider.notifier).updateFromPage(page);
                 },
                 onAyahLongPress: _openAyahActions,
               ),
@@ -335,13 +343,16 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
                 curve: Curves.easeOutCubic,
                 offset: _showTopControls ? Offset.zero : const Offset(0, -1),
                 child: QuranReaderTopBar(
-                  surahName: currentSurahName,
-                  backIconAsset: QuranIconAssets.back,
+                  surahNumber: currentSurah,
                   searchIconAsset: QuranIconAssets.search,
                   surahListIconAsset: QuranIconAssets.surahList,
-                  onBack: () => context.pop(),
+                  barBackground: mushafSpec.pageBackground.withValues(alpha: 0.94),
+                  barTextColor: mushafSpec.verseText,
+                  barAccentColor: mushafSpec.verseNumber,
+                  onClose: () => context.pop(),
                   onSurahList: _openSurahList,
                   onSearch: _openSearch,
+                  onTheme: _openMushafTheme,
                 ),
               ),
             ),
