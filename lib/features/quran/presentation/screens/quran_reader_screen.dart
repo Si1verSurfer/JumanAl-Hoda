@@ -13,6 +13,7 @@ import '../widgets/quran_tafseer_sheet.dart';
 
 abstract final class _ReaderTap {
   static const slop = 18.0;
+  static const longPressThreshold = Duration(milliseconds: 450);
 }
 
 abstract final class _ReaderLayout {
@@ -26,12 +27,14 @@ class _MushafViewport extends StatelessWidget {
     required this.startPage,
     required this.theme,
     required this.onPageChanged,
+    required this.onAyahLongPress,
   });
 
   final PageController pageController;
   final int startPage;
   final QcfThemeData theme;
   final ValueChanged<int> onPageChanged;
+  final void Function(int surahNumber, int verseNumber) onAyahLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -52,10 +55,10 @@ class _MushafViewport extends StatelessWidget {
           child: PageviewQuran(
             controller: pageController,
             initialPageNumber: startPage,
-            h: 1.h,
             theme: theme,
             physics: const BouncingScrollPhysics(),
             onPageChanged: onPageChanged,
+            onLongPress: onAyahLongPress,
           ),
         ),
       ),
@@ -78,6 +81,8 @@ class QuranReaderScreen extends ConsumerStatefulWidget {
 class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
   bool _showTopControls = false;
   Offset? _pointerDown;
+  DateTime? _pointerDownTime;
+
   late final PageController _pageController;
 
   @override
@@ -98,12 +103,18 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
 
   void _onPointerDown(PointerDownEvent event) {
     _pointerDown = event.position;
+    _pointerDownTime = DateTime.now();
   }
 
   void _onPointerUp(PointerUpEvent event) {
     final origin = _pointerDown;
+    final downTime = _pointerDownTime;
     _pointerDown = null;
-    if (origin == null) return;
+    _pointerDownTime = null;
+    if (origin == null || downTime == null) return;
+
+    final held = DateTime.now().difference(downTime);
+    if (held >= _ReaderTap.longPressThreshold) return;
 
     if ((event.position - origin).distance <= _ReaderTap.slop) {
       setState(() => _showTopControls = !_showTopControls);
@@ -112,6 +123,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
 
   void _onPointerCancel(PointerCancelEvent event) {
     _pointerDown = null;
+    _pointerDownTime = null;
   }
 
   void _jumpToSurah(int surahNumber) {
@@ -130,10 +142,18 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
     );
   }
 
-  void _openTafseer(int surahNumber) {
+  void _openSurahTafseer(int surahNumber) {
     showQuranTafseerSheet(
       context,
       surahNumber: surahNumber,
+    );
+  }
+
+  void _openAyahTafseer(int surahNumber, int verseNumber) {
+    showQuranAyahTafseerSheet(
+      context,
+      surahNumber: surahNumber,
+      verseNumber: verseNumber,
     );
   }
 
@@ -163,6 +183,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
                 onPageChanged: (page) {
                   ref.read(quranLastPageProvider.notifier).state = page;
                 },
+                onAyahLongPress: _openAyahTafseer,
               ),
             ),
           ),
@@ -180,16 +201,10 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen> {
                   surahName: currentSurahName,
                   onBack: () => context.pop(),
                   onSurahList: _openSurahList,
-                  onTafseer: () => _openTafseer(currentSurah),
+                  onTafseer: () => _openSurahTafseer(currentSurah),
                 ),
               ),
             ),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: QuranReaderBottomBar(pageNumber: currentPage),
           ),
         ],
       ),

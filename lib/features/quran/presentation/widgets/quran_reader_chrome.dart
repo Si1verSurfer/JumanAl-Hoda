@@ -198,8 +198,6 @@ class QuranReaderActionButton extends StatelessWidget {
   }
 }
 
-enum _FrostedBarEdge { top, bottom }
-
 class _FrostedBar extends StatelessWidget {
   const _FrostedBar({
     required this.child,
@@ -236,3 +234,5 @@ class _FrostedBar extends StatelessWidget {
     );
   }
 }
+
+enum _FrostedBarEdge { top, bottom }
