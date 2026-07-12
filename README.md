@@ -1,30 +1,42 @@
 # جُمانُ الهُدَى
 
-Landing page — React + Vite + TypeScript + Tailwind.
+React landing site in `web/` — deployed on Vercel. Flutter app in `app/` is local only.
 
-| Path | On GitHub | Notes |
-|------|-----------|--------|
-| `web/` | Yes | Website source — deployed via Vercel |
-| `app/` | No | Flutter mobile app (local only, gitignored) |
+## Repo layout
 
-## Website (`web/`)
+```
+├── web/              # Website (on GitHub, deployed to Vercel)
+├── app/              # Flutter mobile app (gitignored, local only)
+├── vercel.json       # Builds from web/ at deploy time
+└── README.md
+```
+
+## Develop locally
 
 ```bash
 cd web
 npm install
 npm run dev
-npm run build
 ```
 
-Routes: `/` (landing), `/privacy`, `/terms`
+Routes: `/` · `/privacy` · `/terms`
 
-## Vercel deploy
+## Vercel (automatic)
 
-The repo includes a root `vercel.json` that builds from `web/` automatically.
+Root `vercel.json` runs:
 
-You can also set **Root Directory** to `web` in Vercel (Settings → General) and use `web/vercel.json` instead — either approach works.
+- `cd web && npm ci`
+- `cd web && npm run build`
+- output: `web/dist`
 
-## Mobile app (`app/` — local only)
+**Root Directory** in Vercel should stay **empty** (repo root). Both projects (`juman-al-hoda`, `juman-al-hoda-ms1b`) use this config.
+
+Production URLs:
+
+- https://juman-al-hoda.vercel.app
+- https://juman-al-hoda-ms1b.vercel.app
+
+## Mobile app (local)
 
 ```bash
 cd app
