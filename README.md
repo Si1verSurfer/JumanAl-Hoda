@@ -1,34 +1,61 @@
-# جُمانُ الهُدَى
+# جُمانُ الهُدَى — Website
 
-This repository contains the **website only** (landing page + legal pages).
+Landing page for **جُمانُ الهُدَى** (React + Vite + TypeScript + Tailwind).
 
-The Flutter iOS app lives locally in `mobile/` and is **not** pushed to GitHub.
+## Project structure
 
-## Website (deployed on Vercel)
+```
+├── public/          Static assets (icons, mockups, manifest)
+├── src/
+│   ├── components/  UI components (Hero, Navbar, Footer, …)
+│   ├── pages/       Route pages (Home, Privacy, Terms, 404)
+│   ├── data/        Content & legal copy (Arabic)
+│   ├── config/      Site URL & metadata
+│   ├── App.tsx      Router
+│   ├── main.tsx     Entry point
+│   └── index.css    Tailwind & brand styles
+├── index.html
+├── vite.config.ts
+├── vercel.json      SPA routing & headers
+└── package.json
+```
+
+## Development
 
 ```bash
-cd website
 npm install
 npm run dev
 ```
 
-### Vercel settings
+Open http://localhost:5173
+
+## Build
+
+```bash
+npm run build
+npm run preview
+```
+
+## Deploy on Vercel
 
 | Setting | Value |
 |---------|--------|
-| **Application Preset** | Vite |
-| **Root Directory** | `website` |
+| **Application Preset** | **Vite** |
+| **Root Directory** | *(empty — repo root)* |
 | **Build Command** | `npm run build` |
 | **Output Directory** | `dist` |
 | **Node.js** | 22.x |
 
-## Mobile app (local only)
+## Routes
 
-```bash
-cd mobile
-flutter pub get
-./scripts/fetch_quran_assets.sh   # first time
-flutter run
-```
+| Path | Page |
+|------|------|
+| `/` | Landing page |
+| `/privacy` | سياسة الخصوصية |
+| `/terms` | الشروط والأحكام |
 
-The `mobile/` folder is gitignored. Keep your own backup or a separate private repo for the app.
+The iOS app loads legal pages from the deployed site with `?embed=1`.
+
+## Mobile app
+
+The Flutter app is kept locally in `mobile/` (not in this repo).
