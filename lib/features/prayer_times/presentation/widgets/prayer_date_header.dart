@@ -45,7 +45,7 @@ class PrayerDateHeader extends StatelessWidget {
         boxShadow: AppColors.cardShadow(isDark: isDark),
       ),
       child: Material(
-        color: AppColors.glassLight,
+        color: AppColors.cardSurface(isDark),
         elevation: 0,
         shadowColor: Colors.transparent,
         borderRadius: BorderRadius.circular(20),

@@ -220,9 +220,7 @@ class _QuranAyahCardTileState extends ConsumerState<QuranAyahCardTile> {
               const SizedBox(height: 8),
               DecoratedBox(
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? AppColors.surfaceDarkElevated
-                      : AppColors.glassLight,
+                  color: AppColors.cardSurface(isDark),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: AppColors.secondary.withValues(alpha: 0.12),

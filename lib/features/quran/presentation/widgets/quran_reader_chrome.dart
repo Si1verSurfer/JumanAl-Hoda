@@ -76,12 +76,12 @@ class QuranReaderTopBar extends StatelessWidget {
                       textAlign: TextAlign.center,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      text: TextSpan(
-                        text:
-                            'surah${surahNumber.toString().padLeft(3, '0')}',
+                      text: SurahFontHelper.surahNameSpan(
+                        surahNumber,
                         style: QuranSurahGridTileStyle.appBarSurahGlyph(
                           barTextColor,
                         ),
+                        package: 'qcf_quran',
                       ),
                     ),
                   ),
@@ -275,10 +275,10 @@ class _FrostedBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final fill = backgroundColor ??
-        (isDark ? AppColors.surfaceDark : AppColors.glassLight)
+        (isDark ? AppColors.surfaceDarkElevated : AppColors.glassLight)
             .withValues(alpha: 0.9);
     final stroke =
-        borderColor ?? AppColors.primary.withValues(alpha: 0.06);
+        borderColor ?? AppColors.primary.withValues(alpha: isDark ? 0.14 : 0.06);
     final radius = borderRadius ?? BorderRadius.zero;
 
     return ClipRRect(

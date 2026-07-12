@@ -7,6 +7,7 @@ abstract final class PrayerArabicLabels {
   static const String remaining = 'مُتَبَقٍّ';
   static const String nextBadge = 'التَّالِيَةُ';
   static const String changeLocation = 'تَغْيِيرُ المَوْقِعِ';
+  static const String currentLocation = 'المَوْقِعُ الحَالِيُّ';
   static const String useMyLocation = 'اسْتِخْدَامُ مَوْقِعِي';
   static const String searchCity = 'ابْحَثْ عَنْ مَدِينَةٍ';
   static const String popularCities = 'مَدِنٌ شَائِعَةٌ';
@@ -20,6 +21,24 @@ abstract final class PrayerArabicLabels {
       'يُرْجَى السَّمَاحُ بِالتَّنْبِيهَاتِ مِنْ إِعْدَادَاتِ الجِهَازِ';
   static const String notificationExactAlarmHint =
       'لِدِقَّةِ التَّنْبِيهَاتِ، فَعِّلِ السَّمَاحَ بِمُنَبِّهَاتِ التَّوْقِيتِ الدَّقِيقَةِ';
+  static const String notificationAzanSound = 'صَوْتُ الأَذَانِ';
+  static const String notificationAzanSubtitle =
+      'اخْتَرْ نَبْرَةَ الأَذَانِ الأَقْرَبَ لِقَلْبِكَ';
+  static const String notificationAzanOption1 = 'مَنْصُور الزَّهْرَانِي';
+  static const String notificationAzanOption1Hint = 'أَذَانٌ هَادِئٌ وَمُؤَثِّرٌ';
+  static const String notificationAzanOption2 = 'عَبْد البَاسِط';
+  static const String notificationAzanOption2Hint = 'أَذَانٌ تَقْلِيدِيٌّ مَأْثُورٌ';
+  static const String notificationAzanOption3 = 'صَبَاح فَخْرِي';
+  static const String notificationAzanOption3Hint = 'أَذَانٌ مُؤَثِّرٌ وَطَوِيلٌ';
+  static const String notificationAzanOption4 = 'أَذَانٌ هَادِئٌ';
+  static const String notificationAzanOption4Hint = 'نَغْمَةٌ هَادِئَةٌ وَمُمَيَّزَةٌ';
+  static const String notificationAzanTapToPreview = 'اضْغَطْ لِلِاسْتِمَاعِ';
+  static const String notificationAzanPreviewUnavailable =
+      'أعد تشغيل التطبيق بالكامل (Stop ثم Run) لسماع معاينة الأذان';
+  static const String notificationRemindersSection = 'تَذْكِيرَاتُ الأَذْكَارِ';
+  static const String notificationAzkarMorning = 'أَذْكَارُ الصَّبَاحِ';
+  static const String notificationAzkarEvening = 'أَذْكَارُ المَسَاءِ';
+  static const String notificationKahfFriday = 'سُورَةُ الكَهْفِ يَوْمَ الجُمُعَةِ';
 
   static const String fajr = 'الفَجْرُ';
   static const String sunrise = 'الشُّرُوقُ';

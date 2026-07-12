@@ -150,51 +150,80 @@ class _QuranAyahActionsSheet extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 10),
-                Row(
-                  children: AyahHighlightColor.values.map((color) {
-                    final selected = currentHighlight?.color == color;
-                    return Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                          left: color == AyahHighlightColor.green ? 6 : 0,
-                          right: color == AyahHighlightColor.yellow ? 6 : 0,
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    gradient: LinearGradient(
+                      begin: Alignment.topRight,
+                      end: Alignment.bottomLeft,
+                      colors: [
+                        AppColors.secondary.withValues(alpha: isDark ? 0.12 : 0.06),
+                        AppColors.primary.withValues(alpha: isDark ? 0.08 : 0.03),
+                      ],
+                    ),
+                    border: Border.all(
+                      color: AppColors.secondary.withValues(alpha: isDark ? 0.2 : 0.1),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      for (var i = 0; i < AyahHighlightColor.values.length; i++) ...[
+                        if (i > 0) const SizedBox(width: 10),
+                        Expanded(
+                          child: _HighlightColorButton(
+                            color: AyahHighlightColor.values[i],
+                            selected: currentHighlight?.color ==
+                                AyahHighlightColor.values[i],
+                            isDark: isDark,
+                            onTap: () async {
+                              await ref
+                                  .read(quranAyahHighlightsProvider.notifier)
+                                  .toggleHighlight(
+                                    surahNumber: surahNumber,
+                                    verseNumber: verseNumber,
+                                    color: AyahHighlightColor.values[i],
+                                  );
+                            },
+                          ),
                         ),
-                        child: _HighlightColorButton(
-                          color: color,
-                          selected: selected,
-                          isDark: isDark,
-                          onTap: () async {
-                            await ref
-                                .read(quranAyahHighlightsProvider.notifier)
-                                .toggleHighlight(
-                                  surahNumber: surahNumber,
-                                  verseNumber: verseNumber,
-                                  color: color,
-                                );
-                          },
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                      ],
+                    ],
+                  ),
                 ),
                 if (currentHighlight != null) ...[
                   const SizedBox(height: 10),
-                  TextButton(
-                    onPressed: () async {
-                      GomanHaptics.tap();
-                      await ref
-                          .read(quranAyahHighlightsProvider.notifier)
-                          .removeHighlight(
-                            surahNumber: surahNumber,
-                            verseNumber: verseNumber,
-                          );
-                    },
-                    child: Text(
-                      'إزالة التظليل',
-                      style: GoogleFonts.tajawal(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.secondary,
+                  Center(
+                    child: TextButton.icon(
+                      onPressed: () async {
+                        GomanHaptics.tap();
+                        await ref
+                            .read(quranAyahHighlightsProvider.notifier)
+                            .removeHighlight(
+                              surahNumber: surahNumber,
+                              verseNumber: verseNumber,
+                            );
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.secondary,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(
+                            color: AppColors.secondary.withValues(alpha: 0.22),
+                          ),
+                        ),
+                      ),
+                      icon: const Icon(Icons.highlight_off_rounded, size: 18),
+                      label: Text(
+                        'إزالة التظليل',
+                        style: GoogleFonts.tajawal(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ),
@@ -250,48 +279,135 @@ class _HighlightColorButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fill = AyahHighlightColors.chip(color);
+    final surface = AyahHighlightColors.surfaceGradient(
+      color,
+      isDark: isDark,
+      selected: selected,
+    );
+    final labelColor = AyahHighlightColors.labelOnSurface(
+      color,
+      isDark: isDark,
+      selected: selected,
+    );
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap.withHaptic(GomanHapticKind.tap),
-        borderRadius: BorderRadius.circular(14),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          curve: Curves.easeOut,
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            color: fill.withValues(alpha: selected ? 0.28 : 0.12),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: selected ? fill : fill.withValues(alpha: 0.45),
-              width: selected ? 2 : 1,
+        borderRadius: BorderRadius.circular(16),
+        child: AnimatedScale(
+          scale: selected ? 1.02 : 1,
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 240),
+            curve: Curves.easeOutCubic,
+            padding: const EdgeInsets.fromLTRB(8, 14, 8, 12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              gradient: LinearGradient(
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+                colors: surface,
+              ),
+              border: Border.all(
+                color: selected
+                    ? fill.withValues(alpha: isDark ? 0.72 : 0.58)
+                    : fill.withValues(alpha: isDark ? 0.22 : 0.16),
+                width: selected ? 1.8 : 1,
+              ),
+              boxShadow: selected
+                  ? [
+                      BoxShadow(
+                        color: fill.withValues(alpha: isDark ? 0.28 : 0.22),
+                        blurRadius: 14,
+                        offset: const Offset(0, 6),
+                      ),
+                      BoxShadow(
+                        color: fill.withValues(alpha: isDark ? 0.12 : 0.08),
+                        blurRadius: 4,
+                        offset: const Offset(0, 1),
+                      ),
+                    ]
+                  : [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.04),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
             ),
-          ),
-          child: Column(
-            children: [
-              Container(
-                width: 22,
-                height: 22,
-                decoration: BoxDecoration(
-                  color: fill,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.65),
-                    width: 1.5,
+            child: Column(
+              children: [
+                Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.center,
+                  children: [
+                    Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          begin: Alignment.topRight,
+                          end: Alignment.bottomLeft,
+                          colors: AyahHighlightColors.swatchGradient(color),
+                        ),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.72),
+                          width: 2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: fill.withValues(alpha: 0.35),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (selected)
+                      Positioned(
+                        right: -4,
+                        top: -4,
+                        child: Container(
+                          width: 18,
+                          height: 18,
+                          decoration: BoxDecoration(
+                            color: fill,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white,
+                              width: 1.5,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: fill.withValues(alpha: 0.4),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.check_rounded,
+                            size: 11,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  AyahHighlightColors.label(color),
+                  style: GoogleFonts.tajawal(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: labelColor,
                   ),
                 ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                AyahHighlightColors.label(color),
-                style: GoogleFonts.tajawal(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: isDark ? AppColors.surfaceLight : AppColors.primary,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -323,9 +439,7 @@ class _ActionTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           child: Ink(
             decoration: BoxDecoration(
-              color: isDark
-                  ? AppColors.surfaceDarkElevated
-                  : AppColors.glassLight,
+              color: AppColors.cardSurface(isDark),
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
                 color: AppColors.secondary.withValues(alpha: 0.16),

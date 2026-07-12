@@ -64,12 +64,74 @@ abstract final class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          side: const BorderSide(color: AppColors.primary, width: 1.5),
+          foregroundColor:
+              isDark ? AppColors.surfaceLight : AppColors.primary,
+          side: BorderSide(
+            color: isDark
+                ? AppColors.surfaceLight.withValues(alpha: 0.35)
+                : AppColors.primary,
+            width: 1.5,
+          ),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: isDark
+            ? AppColors.surfaceDarkElevated
+            : AppColors.glassLight,
+        hintStyle: TextStyle(
+          color: isDark
+              ? AppColors.surfaceLight.withValues(alpha: 0.45)
+              : AppColors.primary.withValues(alpha: 0.45),
+        ),
+        prefixIconColor: isDark
+            ? AppColors.surfaceLight.withValues(alpha: 0.55)
+            : AppColors.primary.withValues(alpha: 0.45),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(
+            color: AppColors.primary.withValues(alpha: isDark ? 0.18 : 0.08),
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(
+            color: AppColors.primary.withValues(alpha: isDark ? 0.18 : 0.08),
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(
+            color: AppColors.secondary.withValues(alpha: 0.55),
+            width: 1.5,
+          ),
+        ),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      ),
+      tabBarTheme: TabBarThemeData(
+        labelColor: AppColors.secondary,
+        unselectedLabelColor: isDark
+            ? AppColors.surfaceLight.withValues(alpha: 0.55)
+            : AppColors.primary.withValues(alpha: 0.5),
+        indicatorColor: AppColors.secondary,
+        indicatorSize: TabBarIndicatorSize.label,
+        dividerColor: AppColors.primary.withValues(alpha: isDark ? 0.12 : 0.06),
+        labelStyle: AppTextStyles.navLabel(
+          fontSize: 14,
+          fontWeight: FontWeight.w700,
+          color: AppColors.secondary,
+        ),
+        unselectedLabelStyle: AppTextStyles.navLabel(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: isDark
+              ? AppColors.surfaceLight.withValues(alpha: 0.55)
+              : AppColors.primary.withValues(alpha: 0.5),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(

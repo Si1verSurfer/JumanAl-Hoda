@@ -1,5 +1,5 @@
 name: goman_alhoda
-description: "A new Flutter project."
+description: "جُمانُ الهُدَى — مصحف، أذكار، مواقيت الصلاة، خطب، وقبلة."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -60,6 +60,12 @@ dependencies:
   qcf_quran:
     path: packages/quran_package/qcf_quran
   flutter_timezone: ^5.1.0
+  flutter_compass: ^0.8.1
+  just_audio: ^0.10.5
+  pdfrx: ^2.4.4
+  flutter_dynamic_icon_plus: ^1.4.1
+  package_info_plus: ^9.0.1
+  webview_flutter: ^4.14.1
 
 dev_dependencies:
   flutter_test:
@@ -82,7 +88,11 @@ flutter:
   assets:
     - assets/icons/navbar_icons/
     - assets/icons/quran_icons/
-    - assets/appLogo/
+    - assets/icons/general/
+    - assets/icons/IMG_2887.jpg
+    - assets/appLogo/ios/
+    - assets/audio/
+    - assets/khutbahs/khutbahs_index.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

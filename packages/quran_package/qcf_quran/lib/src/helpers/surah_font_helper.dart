@@ -5,47 +5,62 @@ class SurahFontHelper {
   /// The font family name used for surah names.
   static const String fontFamily = 'surahname';
 
-  /// Maps a surah number (1-114) to its corresponding glyph in the surahname font.
-  /// 
-  /// Usually these fonts map the surah number to a specific character.
-  /// Following the pattern "surah001" -> surah 1.
-  static String getSurahGlyph(int surahNumber) {
+  static const _ligatureFeatures = [
+    FontFeature.enable('liga'),
+    FontFeature.enable('clig'),
+  ];
+
+  /// OpenType ligature code for [surahNumber] (e.g. `surah001`).
+  static String ligatureFor(int surahNumber) {
     if (surahNumber < 1 || surahNumber > 114) return '';
-    
-    // Most surah name fonts use the surah number as the character index or 
-    // map it to a specific range. We'll use the surah number as a string 
-    // if the font expects "001", "002", etc., or convert to char.
-    // However, the user mentioned adding "surah001" as a string to show the name.
-    // If the font is designed correctly, maybe it uses ligatures?
-    // For now, we'll return the padded string if that's what the user implies, 
-    // or a single character if that's how the font works.
-    
-    // In many QCF fonts, surah names are indexed by their number.
-    // We'll return the character code corresponding to the surah number.
-    return String.fromCharCode(surahNumber);
+    return 'surah${surahNumber.toString().padLeft(3, '0')}';
   }
 
-  /// Processes a string to replace "surahXXX" patterns with the correct font glyphs.
-  static TextSpan formatSurahText(String text, {TextStyle? style, String? package}) {
-    final RegExp regExp = RegExp(r'surah(\d{3})');
-    final List<InlineSpan> children = [];
-    int lastMatchEnd = 0;
+  static TextStyle _surahNameStyle(TextStyle? style, String? package) {
+    return (style ?? const TextStyle()).copyWith(
+      fontFamily: fontFamily,
+      package: package,
+      fontFeatures: _ligatureFeatures,
+    );
+  }
 
-    for (final Match match in regExp.allMatches(text)) {
+  /// Builds a [TextSpan] for a single surah decorative name glyph.
+  static TextSpan surahNameSpan(
+    int surahNumber, {
+    TextStyle? style,
+    String? package,
+  }) {
+    final ligature = ligatureFor(surahNumber);
+    if (ligature.isEmpty) {
+      return TextSpan(text: '', style: style);
+    }
+
+    return TextSpan(
+      text: ligature,
+      style: _surahNameStyle(style, package),
+    );
+  }
+
+  /// Processes a string to replace "surahXXX" patterns with ligature spans.
+  static TextSpan formatSurahText(
+    String text, {
+    TextStyle? style,
+    String? package,
+  }) {
+    final regExp = RegExp(r'surah(\d{3})');
+    final children = <InlineSpan>[];
+    var lastMatchEnd = 0;
+
+    for (final match in regExp.allMatches(text)) {
       if (match.start > lastMatchEnd) {
         children.add(TextSpan(text: text.substring(lastMatchEnd, match.start)));
       }
 
-      final String surahNumStr = match.group(1)!;
-      final int surahNumber = int.parse(surahNumStr);
-      
+      final surahNumber = int.parse(match.group(1)!);
       children.add(
         TextSpan(
-          text: getSurahGlyph(surahNumber),
-          style: (style ?? const TextStyle()).copyWith(
-            fontFamily: fontFamily,
-            package: package,
-          ),
+          text: ligatureFor(surahNumber),
+          style: _surahNameStyle(style, package),
         ),
       );
 

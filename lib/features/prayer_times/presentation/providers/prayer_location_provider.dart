@@ -4,6 +4,8 @@ import 'package:geolocator/geolocator.dart';
 
 import '../../data/models/prayer_location.dart';
 import '../../data/prayer_location_storage.dart';
+import '../../domain/prayer_location_timezone.dart';
+import '../../notifications/prayer_timezone.dart';
 
 final prayerLocationStorageProvider = Provider<PrayerLocationStorage>(
   (ref) => PrayerLocationStorage(),
@@ -52,14 +54,17 @@ class PrayerLocationNotifier extends StateNotifier<PrayerLocationState> {
 
     final saved = await _storage.load();
     if (saved != null) {
-      state = PrayerLocationReady(saved);
+      state = PrayerLocationReady(_withTimezone(saved));
       return;
     }
     await refreshFromGps();
   }
 
   Future<void> refreshFromGps() async {
-    state = PrayerLocationLoading();
+    final keepCurrentLocation = state is PrayerLocationReady;
+    if (!keepCurrentLocation) {
+      state = PrayerLocationLoading();
+    }
     try {
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
@@ -84,12 +89,15 @@ class PrayerLocationNotifier extends StateNotifier<PrayerLocationState> {
         ),
       );
 
-      final label = await _resolveLabel(position.latitude, position.longitude);
+      final resolved = await _resolvePlace(position.latitude, position.longitude);
+      final timezoneId = await PrayerTimezone.localTimezoneName();
       final location = PrayerLocation(
         latitude: position.latitude,
         longitude: position.longitude,
-        label: label,
+        label: resolved.label,
         source: PrayerLocationSource.gps,
+        timezoneId: timezoneId,
+        country: resolved.country,
       );
       await _storage.save(location);
       state = PrayerLocationReady(location);
@@ -102,21 +110,48 @@ class PrayerLocationNotifier extends StateNotifier<PrayerLocationState> {
     required double latitude,
     required double longitude,
     required String label,
+    String? timezoneId,
+    String? country,
   }) async {
     final location = PrayerLocation(
       latitude: latitude,
       longitude: longitude,
       label: label,
       source: PrayerLocationSource.manual,
+      timezoneId: timezoneId ??
+          PrayerLocationTimezone.forCoordinates(latitude, longitude),
+      country: country,
     );
     await _storage.save(location);
     state = PrayerLocationReady(location);
   }
 
-  Future<String> _resolveLabel(double latitude, double longitude) async {
+  PrayerLocation _withTimezone(PrayerLocation location) {
+    if (location.timezoneId != null && location.timezoneId!.isNotEmpty) {
+      return location;
+    }
+    return PrayerLocation(
+      latitude: location.latitude,
+      longitude: location.longitude,
+      label: location.label,
+      source: location.source,
+      timezoneId: PrayerLocationTimezone.forCoordinates(
+        location.latitude,
+        location.longitude,
+      ),
+      country: location.country,
+    );
+  }
+
+  Future<({String label, String? country})> _resolvePlace(
+    double latitude,
+    double longitude,
+  ) async {
     try {
       final placemarks = await placemarkFromCoordinates(latitude, longitude);
-      if (placemarks.isEmpty) return 'موقعك الحالي';
+      if (placemarks.isEmpty) {
+        return (label: 'موقعك الحالي', country: null);
+      }
       final place = placemarks.first;
       final parts = <String>[
         if (place.locality?.isNotEmpty == true) place.locality!,
@@ -125,10 +160,15 @@ class PrayerLocationNotifier extends StateNotifier<PrayerLocationState> {
           place.subAdministrativeArea!,
         if (place.country?.isNotEmpty == true) place.country!,
       ];
-      if (parts.isEmpty) return 'موقعك الحالي';
-      return parts.take(2).join('، ');
+      if (parts.isEmpty) {
+        return (label: 'موقعك الحالي', country: place.country);
+      }
+      return (
+        label: parts.take(2).join('، '),
+        country: place.country,
+      );
     } catch (_) {
-      return 'موقعك الحالي';
+      return (label: 'موقعك الحالي', country: null);
     }
   }
 }
@@ -147,6 +187,10 @@ Future<List<PopularCity>> searchCities(String query) async {
             label: trimmed,
             latitude: location.latitude,
             longitude: location.longitude,
+            timezoneId: PrayerLocationTimezone.forCoordinates(
+              location.latitude,
+              location.longitude,
+            ),
           ),
         )
         .toList();

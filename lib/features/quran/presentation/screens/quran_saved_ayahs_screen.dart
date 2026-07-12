@@ -75,9 +75,7 @@ class _QuranSavedAyahsScreenState extends ConsumerState<QuranSavedAyahsScreen>
               height: 40,
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: isDark
-                    ? AppColors.surfaceDarkElevated
-                    : AppColors.glassLight,
+                color: AppColors.cardSurface(isDark),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                   color: AppColors.secondary.withValues(alpha: 0.12),

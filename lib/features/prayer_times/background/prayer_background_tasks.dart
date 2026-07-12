@@ -10,25 +10,30 @@ abstract final class PrayerBackgroundTasks {
       'jumanahjumanalhoda.com.prayerMidnightRefresh';
   static const _bootUniqueName = 'prayer_boot_reschedule';
 
+  static DateTime? _scheduledMidnightTarget;
+
   static Future<void> initialize() async {
     await Workmanager().initialize(
       prayerBackgroundCallbackDispatcher,
       isInDebugMode: kDebugMode,
     );
+    await registerBootReschedule();
   }
 
   /// Chains a one-off task after local midnight to refresh cache + notifications.
   ///
-  /// Android only. iOS uses pre-scheduled local notifications (up to 64) plus
-  /// [PrayerScheduleSyncNotifier.syncIfStale] on app resume — BGTaskScheduler
-  /// is unreliable here (Code=3 on simulator and many devices).
+  /// Android only. iOS BGTaskScheduler rejects duplicate pending tasks (Code=1),
+  /// especially in debug/simulator. Prayer times still refresh whenever the app
+  /// resumes via [PrayerScheduleLifecycleListener].
   static Future<void> registerMidnightRefresh() async {
-    if (kIsWeb || defaultTargetPlatform == TargetPlatform.iOS) return;
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
 
     final now = DateTime.now();
     final nextMidnight = DateTime(now.year, now.month, now.day + 1);
     final delay = nextMidnight.difference(now);
     if (delay.isNegative) return;
+
+    if (_scheduledMidnightTarget == nextMidnight) return;
 
     try {
       await Workmanager().registerOneOffTask(
@@ -37,6 +42,7 @@ abstract final class PrayerBackgroundTasks {
         initialDelay: delay,
         existingWorkPolicy: ExistingWorkPolicy.replace,
       );
+      _scheduledMidnightTarget = nextMidnight;
     } catch (error, stackTrace) {
       debugPrint('Prayer midnight refresh scheduling failed: $error');
       debugPrint('$stackTrace');

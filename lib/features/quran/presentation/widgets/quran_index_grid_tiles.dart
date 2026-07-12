@@ -56,7 +56,7 @@ class QuranSurahGridTile extends StatelessWidget {
         boxShadow: AppColors.cardShadow(isDark: isDark),
       ),
       child: Material(
-        color: AppColors.glassLight,
+        color: AppColors.cardSurface(isDark),
         elevation: 0,
         shadowColor: Colors.transparent,
         borderRadius: BorderRadius.circular(16),
@@ -73,9 +73,10 @@ class QuranSurahGridTile extends StatelessWidget {
                     padding: const EdgeInsets.fromLTRB(12, 14, 12, 36),
                     child: RichText(
                       textAlign: TextAlign.center,
-                      text: TextSpan(
-                        text: 'surah${surahNumber.toString().padLeft(3, '0')}',
+                      text: SurahFontHelper.surahNameSpan(
+                        surahNumber,
                         style: QuranSurahGridTileStyle.surahGlyph(titleColor),
+                        package: 'qcf_quran',
                       ),
                     ),
                   ),

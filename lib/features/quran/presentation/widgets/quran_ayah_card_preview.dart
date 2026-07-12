@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:qcf_quran/qcf_quran.dart';
 
+import '../../../../core/constants/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../constants/quran_app_assets.dart';
 import '../../data/models/quran_mushaf_theme.dart';
@@ -134,7 +135,7 @@ class AyahCardBrandingFooter extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                'جمان الهدى',
+                AppStrings.appName,
                 style: GoogleFonts.tajawal(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,

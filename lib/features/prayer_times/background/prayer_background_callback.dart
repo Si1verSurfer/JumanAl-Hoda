@@ -43,8 +43,21 @@ Future<void> runPrayerBackgroundSync() async {
   }
 
   final settings = await PrayerNotificationSettingsStorage().load();
-  await PrayerScheduleSyncService().syncAll(
+  final service = PrayerScheduleSyncService();
+
+  // Offline-first: reschedule from cache immediately (works when device is locked).
+  await service.rescheduleFromCache(
     location: location,
     settings: settings,
   );
+
+  if (service.isCacheStaleForLocation(location) ||
+      await service.needsNotificationRefresh(settings)) {
+    await service.syncAll(
+      location: location,
+      settings: settings,
+    );
+  } else {
+    await PrayerBackgroundTasks.registerMidnightRefresh();
+  }
 }

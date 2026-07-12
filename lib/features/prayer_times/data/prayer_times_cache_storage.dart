@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../domain/prayer_location_timezone.dart';
 import 'models/cached_prayer_day.dart';
+import 'models/prayer_location.dart';
 
 abstract final class PrayerTimesCacheStorage {
   static const _boxName = 'prayer_times_cache_v1';
@@ -11,6 +13,12 @@ abstract final class PrayerTimesCacheStorage {
   static const _metaLocationLabelKey = '__location_label__';
   static const _metaLatKey = '__location_lat__';
   static const _metaLngKey = '__location_lng__';
+  static const _metaCacheVersionKey = '__cache_version__';
+  static const _metaTodayKey = '__cached_today_key__';
+
+  /// Matches Rafiq-Al-Dhikr: refresh after 18 hours even on the same day.
+  static const cacheMaxAge = Duration(hours: 18);
+  static const cacheVersion = 1;
 
   static Box<String>? _box;
 
@@ -29,6 +37,7 @@ abstract final class PrayerTimesCacheStorage {
     required String locationLabel,
     required double latitude,
     required double longitude,
+    String? todayKey,
   }) async {
     await init();
     final box = _box!;
@@ -42,11 +51,16 @@ abstract final class PrayerTimesCacheStorage {
     for (final day in days) {
       await box.put(day.dayKey, jsonEncode(day.toJson()));
     }
-    await box.put(_metaLastSyncKey, DateTime.now().toIso8601String());
+    final now = DateTime.now();
+    await box.put(_metaLastSyncKey, now.toIso8601String());
     await box.put(_metaTimezoneKey, timezoneName);
     await box.put(_metaLocationLabelKey, locationLabel);
     await box.put(_metaLatKey, latitude.toString());
     await box.put(_metaLngKey, longitude.toString());
+    await box.put(_metaCacheVersionKey, cacheVersion.toString());
+    if (todayKey != null) {
+      await box.put(_metaTodayKey, todayKey);
+    }
   }
 
   static CachedPrayerDay? readDay(String dayKey) {
@@ -61,7 +75,8 @@ abstract final class PrayerTimesCacheStorage {
 
   static List<CachedPrayerDay> readRange(String fromKey, String toKey) {
     return readAllDays()
-        .where((day) => day.dayKey.compareTo(fromKey) >= 0 && day.dayKey.compareTo(toKey) <= 0)
+        .where((day) =>
+            day.dayKey.compareTo(fromKey) >= 0 && day.dayKey.compareTo(toKey) <= 0)
         .toList();
   }
 
@@ -93,5 +108,41 @@ abstract final class PrayerTimesCacheStorage {
     final lng = _box?.get(_metaLngKey);
     if (lat == null || lng == null) return null;
     return '$lat|$lng';
+  }
+
+  static String todayKeyFor(PrayerLocation location) {
+    final timezoneId = PrayerLocationTimezone.forLocation(location);
+    final now = PrayerLocationTimezone.nowIn(timezoneId);
+    return CachedPrayerDay.dayKeyFor(now);
+  }
+
+  static bool hasValidToday(PrayerLocation location, {bool allowOld = false}) {
+    final todayKey = todayKeyFor(location);
+    final cached = readDay(todayKey);
+    if (cached == null || !_isComplete(cached)) return false;
+
+    final fingerprint = cachedLocationFingerprint();
+    final current = '${location.latitude}|${location.longitude}';
+    if (fingerprint != current) return false;
+
+    if (allowOld) return true;
+
+    final storedToday = _box?.get(_metaTodayKey);
+    if (storedToday != null && storedToday != todayKey) return false;
+
+    final syncedAt = lastSyncedAt;
+    if (syncedAt == null) return false;
+    if (DateTime.now().difference(syncedAt) > cacheMaxAge) return false;
+
+    final version = int.tryParse(_box?.get(_metaCacheVersionKey) ?? '') ?? 0;
+    return version == cacheVersion;
+  }
+
+  static bool _isComplete(CachedPrayerDay day) {
+    for (final key in CachedPrayerDay.prayerKeys) {
+      final raw = day.timesIso[key];
+      if (raw == null || DateTime.tryParse(raw) == null) return false;
+    }
+    return true;
   }
 }

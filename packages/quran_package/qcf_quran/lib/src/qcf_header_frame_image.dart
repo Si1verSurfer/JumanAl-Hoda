@@ -27,19 +27,35 @@ class QcfHeaderFrameImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final frameColor = theme.headerFrameColor;
+    final centerColor = theme.headerFrameCenterColor;
     final height = width / aspectRatio;
 
     return SizedBox(
       width: width,
       height: height,
-      child: Image(
-        image: _asset,
-        width: width,
-        height: height,
-        fit: BoxFit.contain,
-        color: frameColor,
-        colorBlendMode:
-            frameColor != null ? theme.headerFrameBlendMode : null,
+      child: Stack(
+        alignment: Alignment.center,
+        clipBehavior: Clip.none,
+        children: [
+          Image(
+            image: _asset,
+            width: width,
+            height: height,
+            fit: BoxFit.contain,
+            color: frameColor,
+            colorBlendMode:
+                frameColor != null ? theme.headerFrameBlendMode : null,
+          ),
+          if (centerColor != null)
+            Container(
+              width: width * 0.58,
+              height: height * 0.72,
+              decoration: BoxDecoration(
+                color: centerColor,
+                borderRadius: BorderRadius.circular(height * 0.18),
+              ),
+            ),
+        ],
       ),
     );
   }

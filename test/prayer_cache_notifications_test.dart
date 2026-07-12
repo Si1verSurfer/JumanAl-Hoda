@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:goman_alhoda/features/prayer_times/data/aladhan/aladhan_method_config.dart';
 import 'package:goman_alhoda/features/prayer_times/data/models/cached_prayer_day.dart';
 import 'package:goman_alhoda/features/prayer_times/data/models/daily_prayer_schedule.dart';
 import 'package:goman_alhoda/features/prayer_times/data/models/prayer_location.dart';
@@ -11,6 +12,7 @@ import 'package:goman_alhoda/features/prayer_times/data/prayer_times_repository.
 import 'package:goman_alhoda/features/prayer_times/domain/prayer_schedule_sync_service.dart';
 import 'package:goman_alhoda/features/prayer_times/notifications/prayer_notification_ids.dart';
 import 'package:goman_alhoda/features/prayer_times/notifications/prayer_notification_scheduler.dart';
+import 'package:goman_alhoda/features/prayer_times/notifications/prayer_reminder_scheduler.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -26,6 +28,15 @@ void main() {
       longitude: 46.6753,
       label: 'الرياض',
       source: PrayerLocationSource.manual,
+      timezoneId: 'Asia/Riyadh',
+    );
+
+    const cairo = PrayerLocation(
+      latitude: 30.0444,
+      longitude: 31.2357,
+      label: 'القاهرة',
+      source: PrayerLocationSource.manual,
+      timezoneId: 'Africa/Cairo',
     );
 
     test('computeDayTimes returns all six prayer keys', () {
@@ -80,6 +91,16 @@ void main() {
           direct.entries[i].time.minute,
         );
       }
+    });
+
+    test('cairo uses city timezone and egyptian method', () {
+      final day = repository.computeDayTimes(
+        location: cairo,
+        day: DateTime(2026, 6, 15),
+      );
+      final fajr = day.timeFor(PrayerTimeKind.fajr)!;
+      expect(fajr.hour, inInclusiveRange(2, 5));
+      expect(fajr.minute, inInclusiveRange(0, 59));
     });
   });
 
@@ -236,6 +257,18 @@ void main() {
       expect(count, 64);
     });
 
+    test('reserves iOS slots for azkar and Kahf reminders', () {
+      const settings = PrayerNotificationSettings();
+      expect(PrayerNotificationScheduler.plannedReminderCount(settings), 3);
+      expect(
+        PrayerNotificationScheduler.maxPrayerNotifications(
+          platform: TargetPlatform.iOS,
+          settings: settings,
+        ),
+        61,
+      );
+    });
+
     test('should refresh when pending count is low', () {
       const settings = PrayerNotificationSettings();
       expect(
@@ -253,6 +286,55 @@ void main() {
           platform: TargetPlatform.iOS,
         ),
         isFalse,
+      );
+    });
+  });
+
+  group('PrayerReminderScheduler', () {
+    test('evening azkar is 45 minutes before maghrib', () {
+      final today = CachedPrayerDay(
+        dayKey: '2026-06-15',
+        latitude: 24.7136,
+        longitude: 46.6753,
+        timesIso: {
+          'maghrib': '2026-06-15T18:30:00.000',
+          'fajr': '2026-06-15T04:30:00.000',
+        },
+      );
+      final evening = PrayerReminderScheduler.nextEveningAzkarTime(
+        today: today,
+        now: DateTime(2026, 6, 15, 12),
+      );
+      expect(evening, DateTime(2026, 6, 15, 17, 45));
+    });
+
+    test('morning azkar is 45 minutes after fajr', () {
+      final today = CachedPrayerDay(
+        dayKey: '2026-06-15',
+        latitude: 24.7136,
+        longitude: 46.6753,
+        timesIso: {
+          'fajr': '2026-06-15T04:30:00.000',
+          'maghrib': '2026-06-15T18:30:00.000',
+        },
+      );
+      final morning = PrayerReminderScheduler.nextMorningAzkarTime(
+        today: today,
+        now: DateTime(2026, 6, 15, 3),
+      );
+      expect(morning, DateTime(2026, 6, 15, 5, 15));
+    });
+  });
+
+  group('AladhanMethodConfig', () {
+    test('maps countries to expected methods', () {
+      expect(AladhanMethodConfig.calculationMethodForCountry('Saudi Arabia'),
+          AladhanMethodConfig.methodUmmAlQuraKsa);
+      expect(AladhanMethodConfig.calculationMethodForCountry('Egypt'),
+          AladhanMethodConfig.methodEgypt);
+      expect(
+        AladhanMethodConfig.calculationMethodForCountry('United Arab Emirates'),
+        AladhanMethodConfig.methodUae,
       );
     });
   });

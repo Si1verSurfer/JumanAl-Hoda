@@ -50,4 +50,16 @@ class PrayerNotificationSettingsNotifier
       },
     );
   }
+
+  Future<void> setSelectedAzan(String value) =>
+      updateSettings(state.copyWith(selectedAzan: value));
+
+  Future<void> setAzkarEvening(bool value) =>
+      updateSettings(state.copyWith(azkarEvening: value));
+
+  Future<void> setAzkarMorning(bool value) =>
+      updateSettings(state.copyWith(azkarMorning: value));
+
+  Future<void> setKahfFriday(bool value) =>
+      updateSettings(state.copyWith(kahfFriday: value));
 }

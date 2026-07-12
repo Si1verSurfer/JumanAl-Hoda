@@ -6,9 +6,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../data/constants/prayer_arabic_labels.dart';
+import '../../../../core/constants/app_nav_constants.dart';
 import '../../../../core/haptics/goman_haptics.dart';
 import '../../../../core/navigation/goman_navigation.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/goman_search_field.dart';
 import '../../data/models/prayer_location.dart';
 import '../providers/prayer_location_provider.dart';
 
@@ -37,8 +39,8 @@ class PrayerLocationSheet extends HookConsumerWidget {
     final isSearching = useState(false);
     final query = useState('');
     final titleColor = isDark ? AppColors.surfaceLight : AppColors.primary;
-    final sheetColor =
-        isDark ? AppColors.surfaceDarkElevated : AppColors.glassLight;
+    final sheetColor = AppColors.cardSurface(isDark);
+    final sheetBottomInset = AppNavConstants.modalSheetBottomInset(context);
 
     final viewInsets = MediaQuery.viewInsetsOf(context);
     final screenHeight = MediaQuery.sizeOf(context).height;
@@ -81,6 +83,8 @@ class PrayerLocationSheet extends HookConsumerWidget {
             latitude: city.latitude,
             longitude: city.longitude,
             label: city.label,
+            timezoneId: city.timezoneId,
+            country: city.country,
           );
       if (context.mounted) Navigator.of(context).pop();
     }
@@ -97,7 +101,7 @@ class PrayerLocationSheet extends HookConsumerWidget {
           duration: const Duration(milliseconds: 220),
           curve: Curves.easeOutCubic,
           height: sheetHeight,
-          margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+          margin: EdgeInsets.fromLTRB(12, 0, 12, sheetBottomInset),
           decoration: BoxDecoration(
             color: sheetColor,
             borderRadius: BorderRadius.circular(24),
@@ -129,11 +133,11 @@ class PrayerLocationSheet extends HookConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 14),
-                    _LocationSearchField(
+                    GomanSearchField(
                       controller: controller,
                       focusNode: focusNode,
                       isDark: isDark,
-                      titleColor: titleColor,
+                      hintText: PrayerArabicLabels.searchCity,
                     ),
                     const SizedBox(height: 10),
                     SizedBox(
@@ -185,124 +189,15 @@ class PrayerLocationSheet extends HookConsumerWidget {
                   isDark: isDark,
                   titleColor: titleColor,
                   keyboardOpen: keyboardOpen,
+                  bottomInset: sheetBottomInset,
                   onSelect: selectCity,
                 ),
               ),
-              SizedBox(height: keyboardOpen ? 6 : 12),
+              SizedBox(height: keyboardOpen ? 6 : 8),
             ],
           ),
         ),
       ),
-    );
-  }
-}
-
-class _LocationSearchField extends StatelessWidget {
-  const _LocationSearchField({
-    required this.controller,
-    required this.focusNode,
-    required this.isDark,
-    required this.titleColor,
-  });
-
-  final TextEditingController controller;
-  final FocusNode focusNode;
-  final bool isDark;
-  final Color titleColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: controller,
-      builder: (context, _) {
-        final hasQuery = controller.text.trim().isNotEmpty;
-
-        return Container(
-          height: 52,
-          decoration: BoxDecoration(
-            color: isDark
-                ? AppColors.surfaceDark
-                : AppColors.surfaceElevatedLight,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(
-              color: AppColors.primary.withValues(alpha: isDark ? 0.14 : 0.07),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primary.withValues(alpha: 0.05),
-                blurRadius: 14,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: TextField(
-            controller: controller,
-            focusNode: focusNode,
-            textAlign: TextAlign.right,
-            style: GoogleFonts.notoNaskhArabic(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              color: titleColor,
-            ),
-            decoration: InputDecoration(
-              hintText: PrayerArabicLabels.searchCity,
-              hintStyle: GoogleFonts.notoNaskhArabic(
-                fontSize: 14,
-                color: titleColor.withValues(alpha: 0.38),
-              ),
-              isDense: true,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
-              prefixIcon: Padding(
-                padding: const EdgeInsets.only(left: 10, right: 4),
-                child: Container(
-                  width: 34,
-                  height: 34,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topRight,
-                      end: Alignment.bottomLeft,
-                      colors: [
-                        AppColors.secondary.withValues(alpha: 0.16),
-                        AppColors.secondary.withValues(alpha: 0.06),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(11),
-                  ),
-                  child: Icon(
-                    Icons.search_rounded,
-                    size: 20,
-                    color: AppColors.secondary.withValues(alpha: 0.88),
-                  ),
-                ),
-              ),
-              prefixIconConstraints: const BoxConstraints(
-                minWidth: 48,
-                minHeight: 34,
-              ),
-              suffixIcon: hasQuery
-                  ? IconButton(
-                      onPressed: controller.clear,
-                      icon: Icon(
-                        Icons.cancel_rounded,
-                        size: 20,
-                        color: AppColors.secondary.withValues(alpha: 0.65),
-                      ),
-                    )
-                  : null,
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(18),
-                borderSide: BorderSide(
-                  color: AppColors.secondary.withValues(alpha: 0.55),
-                  width: 1.2,
-                ),
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 }
@@ -314,6 +209,7 @@ class _CityResultsList extends StatelessWidget {
     required this.isDark,
     required this.titleColor,
     required this.keyboardOpen,
+    required this.bottomInset,
     required this.onSelect,
   });
 
@@ -322,6 +218,7 @@ class _CityResultsList extends StatelessWidget {
   final bool isDark;
   final Color titleColor;
   final bool keyboardOpen;
+  final double bottomInset;
   final ValueChanged<PopularCity> onSelect;
 
   @override
@@ -348,7 +245,7 @@ class _CityResultsList extends StatelessWidget {
     }
 
     return ListView.separated(
-      padding: EdgeInsets.fromLTRB(20, 0, 20, keyboardOpen ? 4 : 8),
+      padding: EdgeInsets.fromLTRB(20, 0, 20, keyboardOpen ? 8 : 16),
       itemCount: cities.length,
       separatorBuilder: (_, _) => const SizedBox(height: 8),
       itemBuilder: (context, index) {

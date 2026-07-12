@@ -142,7 +142,7 @@ class _ModeChip extends StatelessWidget {
             decoration: BoxDecoration(
               color: selected
                   ? AppColors.secondary.withValues(alpha: 0.14)
-                  : AppColors.glassLight,
+                  : AppColors.cardSurface(isDark),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: selected
@@ -195,7 +195,7 @@ class _NumberChip extends StatelessWidget {
           decoration: BoxDecoration(
             color: selected
                 ? AppColors.secondary.withValues(alpha: 0.14)
-                : AppColors.glassLight,
+                : AppColors.cardSurface(isDark),
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: selected

@@ -11,7 +11,7 @@ import '../../data/constants/prayer_arabic_labels.dart';
 import '../../notifications/prayer_notification_service.dart';
 import '../providers/prayer_countdown_provider.dart';
 import '../providers/prayer_location_provider.dart';
-import '../providers/prayer_schedule_sync_provider.dart';
+import '../providers/prayer_time_label_provider.dart';
 import '../providers/prayer_times_provider.dart';
 import '../theme/prayer_page_style.dart';
 import '../widgets/prayer_date_header.dart';
@@ -29,18 +29,12 @@ class PrayerTimesScreen extends HookConsumerWidget {
     final locationState = ref.watch(prayerLocationProvider);
     final schedule = ref.watch(prayerScheduleProvider);
     final countdown = ref.watch(prayerCountdownProvider);
-    final repository = ref.watch(prayerTimesRepositoryProvider);
-
-    useEffect(() {
-      ref.read(prayerCountdownProvider.notifier);
-      return null;
-    }, const []);
+    final formatTime = ref.watch(prayerTimeLabelProvider);
 
     useEffect(() {
       if (locationState is PrayerLocationReady) {
         Future.microtask(() async {
           await PrayerNotificationService.requestPermissions();
-          await ref.read(prayerScheduleSyncProvider.notifier).syncIfStale();
         });
       }
       return null;
@@ -119,8 +113,7 @@ class PrayerTimesScreen extends HookConsumerWidget {
                     const SizedBox(height: 14),
                     PrayerNextHeroCard(
                       prayerName: schedule.nextSalahName(),
-                      prayerTimeLabel:
-                          repository.formatTime(schedule.nextSalahTime),
+                      prayerTimeLabel: formatTime(schedule.nextSalahTime),
                       countdownLabel: countdown.label,
                       locationLabel: schedule.locationLabel,
                       isDark: isDark,
@@ -130,7 +123,7 @@ class PrayerTimesScreen extends HookConsumerWidget {
                     PrayerTimesListCard(
                       entries: schedule.entries,
                       isDark: isDark,
-                      timeLabelFor: repository.formatTime,
+                      timeLabelFor: formatTime,
                     ),
                   ],
                   SizedBox(height: bottomPadding),
@@ -154,7 +147,7 @@ class _LoadingState extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 48),
       decoration: BoxDecoration(
-        color: AppColors.glassLight,
+        color: AppColors.cardSurface(isDark),
         borderRadius: BorderRadius.circular(16),
         boxShadow: AppColors.cardShadow(isDark: isDark),
       ),
@@ -194,7 +187,7 @@ class _ErrorState extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.glassLight,
+        color: AppColors.cardSurface(isDark),
         borderRadius: BorderRadius.circular(16),
         boxShadow: AppColors.cardShadow(isDark: isDark),
       ),

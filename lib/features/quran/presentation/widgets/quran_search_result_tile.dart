@@ -29,7 +29,7 @@ class QuranSearchResultTile extends StatelessWidget {
           boxShadow: AppColors.cardShadow(isDark: isDark),
         ),
         child: Material(
-          color: AppColors.glassLight,
+          color: AppColors.cardSurface(isDark),
           borderRadius: BorderRadius.circular(14),
           clipBehavior: Clip.antiAlias,
           child: InkWell(

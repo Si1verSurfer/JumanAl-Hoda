@@ -51,10 +51,10 @@ abstract final class AppTextStyles {
     required Color color,
     double? letterSpacing,
   }) {
-    return GoogleFonts.notoNaskhArabic(
+    return GoogleFonts.tajawal(
       fontSize: fontSize,
       fontWeight: fontWeight,
-      height: 1.1,
+      height: 1.2,
       color: color,
       letterSpacing: letterSpacing,
     );

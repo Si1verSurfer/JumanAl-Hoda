@@ -33,6 +33,31 @@ abstract final class PrayerNotificationScheduler {
         (settings == null ? PrayerTimeKind.values.length : enabledPrayersPerDay(settings));
   }
 
+  /// Reminders that will be scheduled alongside prayer azan notifications.
+  static int plannedReminderCount(PrayerNotificationSettings settings) {
+    var count = 0;
+    if (settings.azkarEvening) count++;
+    if (settings.azkarMorning) count++;
+    if (settings.kahfFriday) count++;
+    return count;
+  }
+
+  /// iOS shares one 64-slot queue for prayers and reminders.
+  static int maxPrayerNotifications({
+    TargetPlatform? platform,
+    PrayerNotificationSettings? settings,
+  }) {
+    final limit = maxSchedulableNotifications(
+      platform: platform,
+      settings: settings,
+    );
+    final resolvedPlatform = platform ?? defaultTargetPlatform;
+    if (resolvedPlatform != TargetPlatform.iOS || settings == null) {
+      return limit;
+    }
+    return (limit - plannedReminderCount(settings)).clamp(0, limit);
+  }
+
   static int countFutureNotifications({
     required List<CachedPrayerDay> days,
     required PrayerNotificationSettings settings,

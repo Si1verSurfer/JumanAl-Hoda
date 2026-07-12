@@ -6,6 +6,7 @@ class GomanNavItem {
     this.icon,
     this.selectedIcon,
     required this.label,
+    this.preserveOriginalColors = false,
   }) : assert(
           iconAsset != null || (icon != null && selectedIcon != null),
           'Provide iconAsset or both icon and selectedIcon.',
@@ -15,4 +16,7 @@ class GomanNavItem {
   final IconData? icon;
   final IconData? selectedIcon;
   final String label;
+
+  /// When true, SVG icons keep their embedded colors instead of theme tinting.
+  final bool preserveOriginalColors;
 }

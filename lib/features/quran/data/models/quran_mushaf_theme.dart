@@ -7,6 +7,8 @@ enum QuranMushafTheme {
   dusk,
   rose,
   indigo,
+  cream,
+  kaaba,
 }
 
 class QuranMushafThemeSpec {
@@ -108,6 +110,30 @@ abstract final class QuranMushafThemes {
     swatch: Color(0xFFA89CE8),
   );
 
+  static const cream = QuranMushafThemeSpec(
+    id: QuranMushafTheme.cream,
+    label: 'جمان',
+    pageBackground: Color(0xFFFAF0E6),
+    verseText: Color(0xFF3A0E14),
+    verseNumber: Color(0xFF9A5B4E),
+    basmala: Color(0xFF4D1820),
+    headerText: Color(0xFF4D1820),
+    headerFrame: Color(0xFFB8896A),
+    swatch: Color(0xFFE2C9A8),
+  );
+
+  static const kaaba = QuranMushafThemeSpec(
+    id: QuranMushafTheme.kaaba,
+    label: 'كعبي',
+    pageBackground: Color(0xFF0A0808),
+    verseText: Color(0xFFF2E4C4),
+    verseNumber: Color(0xFFD4AF37),
+    basmala: Color(0xFFE8D5A8),
+    headerText: Color(0xFFC9A227),
+    headerFrame: Color(0xFFB8860B),
+    swatch: Color(0xFF3D3220),
+  );
+
   static QuranMushafThemeSpec specFor(QuranMushafTheme theme) {
     return switch (theme) {
       QuranMushafTheme.classic => classic,
@@ -116,6 +142,8 @@ abstract final class QuranMushafThemes {
       QuranMushafTheme.dusk => dusk,
       QuranMushafTheme.rose => rose,
       QuranMushafTheme.indigo => indigo,
+      QuranMushafTheme.cream => cream,
+      QuranMushafTheme.kaaba => kaaba,
     };
   }
 
@@ -126,5 +154,7 @@ abstract final class QuranMushafThemes {
     dusk,
     rose,
     indigo,
+    cream,
+    kaaba,
   ];
 }

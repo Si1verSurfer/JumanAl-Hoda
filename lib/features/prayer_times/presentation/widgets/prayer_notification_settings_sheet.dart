@@ -11,7 +11,9 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/platform_utils.dart';
 import '../../data/constants/prayer_arabic_labels.dart';
 import '../../data/models/daily_prayer_schedule.dart';
+import '../../notifications/azan_preview_service.dart';
 import '../../notifications/prayer_notification_service.dart';
+import '../widgets/azan_sound_picker.dart';
 import '../providers/prayer_notification_settings_provider.dart';
 
 void showPrayerNotificationSettingsSheet(BuildContext context, WidgetRef ref) {
@@ -21,7 +23,7 @@ void showPrayerNotificationSettingsSheet(BuildContext context, WidgetRef ref) {
     useSafeArea: true,
     backgroundColor: Colors.transparent,
     builder: (context) => const PrayerNotificationSettingsSheet(),
-  );
+  ).whenComplete(AzanPreviewService.stop);
 }
 
 Future<void> _handleMasterToggle(
@@ -77,8 +79,7 @@ class PrayerNotificationSettingsSheet extends ConsumerWidget {
     final settings = ref.watch(prayerNotificationSettingsProvider);
     final notifier = ref.read(prayerNotificationSettingsProvider.notifier);
     final titleColor = isDark ? AppColors.surfaceLight : AppColors.primary;
-    final sheetColor =
-        isDark ? AppColors.surfaceDarkElevated : AppColors.glassLight;
+    final sheetColor = AppColors.cardSurface(isDark);
     final bottomMargin = PlatformUtils.isIOS
         ? AppNavConstants.floatingBottomPadding(context)
         : 24.0;
@@ -105,7 +106,7 @@ class PrayerNotificationSettingsSheet extends ConsumerWidget {
                 if (states.contains(WidgetState.selected)) {
                   return AppColors.onPrimary;
                 }
-                return isDark ? AppColors.surfaceLight : Colors.white;
+                return AppColors.cardSurface(isDark);
               }),
               trackColor: WidgetStateProperty.resolveWith((states) {
                 if (states.contains(WidgetState.selected)) {
@@ -221,6 +222,86 @@ class PrayerNotificationSettingsSheet extends ConsumerWidget {
                                   },
                                 ),
                               ],
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        AzanSoundPicker(
+                          titleColor: titleColor,
+                          isDark: isDark,
+                          selected: settings.resolvedAzanSound,
+                          enabled: settings.masterEnabled,
+                          onChanged: notifier.setSelectedAzan,
+                        ),
+                        const SizedBox(height: 14),
+                        Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: Text(
+                            PrayerArabicLabels.notificationRemindersSection,
+                            style: GoogleFonts.notoNaskhArabic(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: titleColor.withValues(alpha: 0.82),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? AppColors.surfaceDark
+                                : AppColors.surfaceElevatedLight,
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(
+                              color: AppColors.primary.withValues(alpha: 0.06),
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              _PrayerToggleRow(
+                                label: PrayerArabicLabels.notificationAzkarMorning,
+                                titleColor: titleColor,
+                                value: settings.azkarMorning,
+                                enabled: settings.masterEnabled,
+                                onChanged: (value) {
+                                  GomanHaptics.tap();
+                                  notifier.setAzkarMorning(value);
+                                },
+                              ),
+                              Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: AppColors.primary.withValues(alpha: 0.06),
+                                indent: 16,
+                                endIndent: 16,
+                              ),
+                              _PrayerToggleRow(
+                                label: PrayerArabicLabels.notificationAzkarEvening,
+                                titleColor: titleColor,
+                                value: settings.azkarEvening,
+                                enabled: settings.masterEnabled,
+                                onChanged: (value) {
+                                  GomanHaptics.tap();
+                                  notifier.setAzkarEvening(value);
+                                },
+                              ),
+                              Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: AppColors.primary.withValues(alpha: 0.06),
+                                indent: 16,
+                                endIndent: 16,
+                              ),
+                              _PrayerToggleRow(
+                                label: PrayerArabicLabels.notificationKahfFriday,
+                                titleColor: titleColor,
+                                value: settings.kahfFriday,
+                                enabled: settings.masterEnabled,
+                                onChanged: (value) {
+                                  GomanHaptics.tap();
+                                  notifier.setKahfFriday(value);
+                                },
+                              ),
                             ],
                           ),
                         ),

@@ -22,11 +22,20 @@ class GomanNavIcon extends StatelessWidget {
         selected ? AppNavConstants.selectedIconSize : AppNavConstants.iconSize;
 
     if (item.iconAsset != null) {
-      return SvgPicture.asset(
+      final picture = SvgPicture.asset(
         item.iconAsset!,
         width: size,
         height: size,
-        colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+        colorFilter: item.preserveOriginalColors
+            ? null
+            : ColorFilter.mode(color, BlendMode.srcIn),
+      );
+
+      if (!item.preserveOriginalColors) return picture;
+
+      return Opacity(
+        opacity: selected ? 1 : 0.72,
+        child: picture,
       );
     }
 

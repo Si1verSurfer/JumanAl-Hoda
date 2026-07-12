@@ -25,7 +25,7 @@ class PrayerTimesListCard extends StatelessWidget {
         boxShadow: AppColors.cardShadow(isDark: isDark),
       ),
       child: Material(
-        color: AppColors.glassLight,
+        color: AppColors.cardSurface(isDark),
         elevation: 0,
         shadowColor: Colors.transparent,
         borderRadius: BorderRadius.circular(20),
@@ -37,7 +37,7 @@ class PrayerTimesListCard extends StatelessWidget {
                 Divider(
                   height: 1,
                   thickness: 1,
-                  color: AppColors.primary.withValues(alpha: 0.06),
+                  color: AppColors.dividerOnCard(isDark),
                   indent: 16,
                   endIndent: 16,
                 ),

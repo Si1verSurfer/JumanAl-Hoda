@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -23,8 +25,24 @@ class AnimatedEntrance extends HookConsumerWidget {
     );
 
     useEffect(() {
-      Future<void>.delayed(delay, controller.forward);
-      return null;
+      var cancelled = false;
+
+      void start() {
+        if (cancelled) return;
+        controller.forward();
+      }
+
+      Timer? timer;
+      if (delay == Duration.zero) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => start());
+      } else {
+        timer = Timer(delay, start);
+      }
+
+      return () {
+        cancelled = true;
+        timer?.cancel();
+      };
     }, [controller, delay]);
 
     return FadeTransition(

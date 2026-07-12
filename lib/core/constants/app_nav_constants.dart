@@ -30,4 +30,9 @@ abstract final class AppNavConstants {
   static double floatingBottomPadding(BuildContext context) {
     return barHeight + bottomMargin + 12;
   }
+
+  /// Bottom inset for modal sheets above the floating nav bar.
+  static double modalSheetBottomInset(BuildContext context) {
+    return floatingBottomPadding(context) + MediaQuery.paddingOf(context).bottom;
+  }
 }

@@ -7,7 +7,13 @@ class PrayerNotificationSettings {
     this.asr = true,
     this.maghrib = true,
     this.isha = true,
+    this.selectedAzan = 'azano',
+    this.azkarEvening = true,
+    this.azkarMorning = true,
+    this.kahfFriday = true,
   });
+
+  static const validAzanSounds = ['azano', 'azant', 'azanc', 'azand'];
 
   final bool masterEnabled;
   final bool fajr;
@@ -16,6 +22,15 @@ class PrayerNotificationSettings {
   final bool asr;
   final bool maghrib;
   final bool isha;
+  final String selectedAzan;
+  final bool azkarEvening;
+  final bool azkarMorning;
+  final bool kahfFriday;
+
+  String get resolvedAzanSound {
+    final sound = selectedAzan.trim().toLowerCase();
+    return validAzanSounds.contains(sound) ? sound : 'azano';
+  }
 
   bool isEnabledFor(String prayerKey) {
     if (!masterEnabled) return false;
@@ -38,6 +53,10 @@ class PrayerNotificationSettings {
     bool? asr,
     bool? maghrib,
     bool? isha,
+    String? selectedAzan,
+    bool? azkarEvening,
+    bool? azkarMorning,
+    bool? kahfFriday,
   }) {
     return PrayerNotificationSettings(
       masterEnabled: masterEnabled ?? this.masterEnabled,
@@ -47,6 +66,10 @@ class PrayerNotificationSettings {
       asr: asr ?? this.asr,
       maghrib: maghrib ?? this.maghrib,
       isha: isha ?? this.isha,
+      selectedAzan: selectedAzan ?? this.selectedAzan,
+      azkarEvening: azkarEvening ?? this.azkarEvening,
+      azkarMorning: azkarMorning ?? this.azkarMorning,
+      kahfFriday: kahfFriday ?? this.kahfFriday,
     );
   }
 
@@ -58,6 +81,10 @@ class PrayerNotificationSettings {
         'asr': asr,
         'maghrib': maghrib,
         'isha': isha,
+        'selectedAzan': selectedAzan,
+        'azkarEvening': azkarEvening,
+        'azkarMorning': azkarMorning,
+        'kahfFriday': kahfFriday,
       };
 
   factory PrayerNotificationSettings.fromJson(Map<String, dynamic> json) {
@@ -69,6 +96,10 @@ class PrayerNotificationSettings {
       asr: json['asr'] as bool? ?? true,
       maghrib: json['maghrib'] as bool? ?? true,
       isha: json['isha'] as bool? ?? true,
+      selectedAzan: json['selectedAzan'] as String? ?? 'azano',
+      azkarEvening: json['azkarEvening'] as bool? ?? true,
+      azkarMorning: json['azkarMorning'] as bool? ?? true,
+      kahfFriday: json['kahfFriday'] as bool? ?? true,
     );
   }
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'prayer_location_provider.dart';
 import 'prayer_times_provider.dart';
 
 class PrayerCountdownState {
@@ -19,40 +20,66 @@ class PrayerCountdownState {
   );
 }
 
-final prayerCountdownProvider =
-    StateNotifierProvider<PrayerCountdownNotifier, PrayerCountdownState>(
-  (ref) => PrayerCountdownNotifier(ref),
-);
+/// Emits the current time once per second for live countdown updates.
+final prayerSecondTickerProvider = StreamProvider<DateTime>((ref) {
+  ref.keepAlive();
 
-class PrayerCountdownNotifier extends StateNotifier<PrayerCountdownState> {
-  PrayerCountdownNotifier(this._ref) : super(PrayerCountdownState.empty) {
-    _tick();
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) => _tick());
-  }
+  final controller = StreamController<DateTime>();
+  controller.add(DateTime.now());
 
-  final Ref _ref;
-  Timer? _timer;
-
-  void _tick() {
-    final schedule = _ref.read(prayerScheduleProvider);
-    if (schedule == null) {
-      state = PrayerCountdownState.empty;
-      return;
+  final timer = Timer.periodic(const Duration(seconds: 1), (_) {
+    if (!controller.isClosed) {
+      controller.add(DateTime.now());
     }
+  });
 
-    final repository = _ref.read(prayerTimesRepositoryProvider);
-    final remaining = schedule.nextSalahTime.difference(DateTime.now());
-    state = PrayerCountdownState(
-      remaining: remaining.isNegative ? Duration.zero : remaining,
-      label: repository.formatCountdown(
-        remaining.isNegative ? Duration.zero : remaining,
-      ),
-    );
+  ref.onDispose(() {
+    timer.cancel();
+    controller.close();
+  });
+
+  return controller.stream;
+});
+
+/// Rolls the schedule forward when the current next-prayer time has passed.
+final prayerScheduleAutoRefreshProvider = Provider<void>((ref) {
+  ref.watch(prayerSecondTickerProvider);
+
+  final schedule = ref.read(prayerScheduleProvider);
+  if (schedule == null) return;
+
+  final locationState = ref.read(prayerLocationProvider);
+  if (locationState is! PrayerLocationReady) return;
+
+  final repository = ref.read(prayerTimesRepositoryProvider);
+  final now = repository.cityNow(locationState.location);
+  if (!schedule.nextSalahTime.isAfter(now)) {
+    ref.invalidate(prayerScheduleProvider);
+  }
+});
+
+final prayerCountdownProvider = Provider<PrayerCountdownState>((ref) {
+  ref.watch(prayerScheduleAutoRefreshProvider);
+  ref.watch(prayerSecondTickerProvider);
+
+  final schedule = ref.watch(prayerScheduleProvider);
+  if (schedule == null) {
+    return PrayerCountdownState.empty;
   }
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
+  final locationState = ref.watch(prayerLocationProvider);
+  if (locationState is! PrayerLocationReady) {
+    return PrayerCountdownState.empty;
   }
-}
+
+  final repository = ref.read(prayerTimesRepositoryProvider);
+  final now = repository.cityNow(locationState.location);
+  final remaining = schedule.nextSalahTime.difference(now);
+  final clamped =
+      remaining.isNegative ? Duration.zero : remaining;
+
+  return PrayerCountdownState(
+    remaining: clamped,
+    label: repository.formatCountdown(clamped),
+  );
+});

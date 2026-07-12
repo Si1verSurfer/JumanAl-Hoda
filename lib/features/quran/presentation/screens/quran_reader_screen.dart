@@ -12,6 +12,7 @@ import '../providers/quran_mushaf_theme_provider.dart';
 import '../providers/quran_reading_provider.dart';
 import '../utils/ayah_highlight_colors.dart';
 import '../utils/quran_page_utils.dart';
+import '../theme/quran_cream_mushaf_theme.dart';
 import '../widgets/quran_ayah_actions_sheet.dart';
 import '../widgets/quran_mushaf_theme_sheet.dart';
 import '../widgets/quran_reader_chrome.dart';
@@ -298,6 +299,7 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
     final mushafSpec = QuranMushafThemes.specFor(mushafThemeId);
     final theme = ref.watch(quranMushafQcfThemeProvider);
     final isDarkMushaf = mushafSpec.isDarkBackground;
+    final isCreamMushaf = mushafThemeId == QuranMushafTheme.cream;
     final startPage = widget.initialPageNumber.clamp(1, totalPagesCount);
     final currentPage = ref.watch(quranLastReadingProvider).page;
     final currentSurah = getPrimarySurahForPage(currentPage);
@@ -332,6 +334,26 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
               ),
             ),
           ),
+          if (isCreamMushaf) ...[
+            const Positioned.fill(
+              child: IgnorePointer(
+                child: DecoratedBox(
+                  decoration: QuranCreamMushafTheme.pageAmbiance,
+                ),
+              ),
+            ),
+            const Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 120,
+              child: IgnorePointer(
+                child: DecoratedBox(
+                  decoration: QuranCreamMushafTheme.topEdgeGlow,
+                ),
+              ),
+            ),
+          ],
           Positioned(
             top: 0,
             left: 0,
@@ -347,7 +369,8 @@ class _QuranReaderScreenState extends ConsumerState<QuranReaderScreen>
                   searchIconAsset: QuranIconAssets.search,
                   surahListIconAsset: QuranIconAssets.surahList,
                   barBackground: mushafSpec.pageBackground.withValues(alpha: 0.94),
-                  barTextColor: mushafSpec.verseText,
+                  barTextColor:
+                      isCreamMushaf ? mushafSpec.headerText : mushafSpec.verseText,
                   barAccentColor: mushafSpec.verseNumber,
                   onClose: () => context.pop(),
                   onSurahList: _openSurahList,

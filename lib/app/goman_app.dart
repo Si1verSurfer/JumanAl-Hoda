@@ -15,7 +15,8 @@ class GomanApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
-    final themeMode = ref.watch(themeModeProvider);
+    final themeMode =
+        ref.watch(themeModeProvider).valueOrNull ?? ThemeMode.system;
 
     return ScreenUtilInit(
       designSize: QuranScreenUtilConfig.designSize,

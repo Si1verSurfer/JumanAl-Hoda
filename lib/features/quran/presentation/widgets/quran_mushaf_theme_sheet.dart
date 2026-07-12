@@ -28,8 +28,7 @@ class QuranMushafThemeSheet extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final selected = ref.watch(quranMushafThemeProvider);
     final titleColor = isDark ? AppColors.surfaceLight : AppColors.primary;
-    final sheetColor =
-        isDark ? AppColors.surfaceDarkElevated : AppColors.glassLight;
+    final sheetColor = AppColors.cardSurface(isDark);
     final bottomMargin = PlatformUtils.isIOS
         ? AppNavConstants.floatingBottomPadding(context)
         : 24.0;
@@ -81,6 +80,7 @@ class QuranMushafThemeSheet extends ConsumerWidget {
                       _ThemeOptionTile(
                         spec: spec,
                         isSelected: selected == spec.id,
+                        isFeatured: spec.id == QuranMushafTheme.cream,
                         onTap: () {
                           GomanHaptics.confirm();
                           ref
@@ -105,73 +105,160 @@ class _ThemeOptionTile extends StatelessWidget {
     required this.spec,
     required this.isSelected,
     required this.onTap,
+    this.isFeatured = false,
   });
 
   final QuranMushafThemeSpec spec;
   final bool isSelected;
+  final bool isFeatured;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final borderColor = isSelected
+        ? (isFeatured ? spec.headerFrame : AppColors.secondary)
+        : isFeatured
+            ? spec.headerFrame.withValues(alpha: 0.45)
+            : AppColors.primary.withValues(alpha: 0.08);
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(18),
         child: Ink(
-          width: 148,
+          width: isFeatured ? 156 : 148,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: isSelected
-                  ? AppColors.secondary
-                  : AppColors.primary.withValues(alpha: 0.08),
+              color: borderColor,
               width: isSelected ? 2 : 1,
             ),
-            color: spec.pageBackground,
+            gradient: isFeatured
+                ? LinearGradient(
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                    colors: [
+                      spec.pageBackground,
+                      Color.lerp(spec.pageBackground, spec.swatch, 0.35)!,
+                    ],
+                  )
+                : null,
+            color: isFeatured ? null : spec.pageBackground,
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: AppColors.secondary.withValues(alpha: 0.18),
-                      blurRadius: 14,
+                      color: (isFeatured ? spec.headerFrame : AppColors.secondary)
+                          .withValues(alpha: 0.22),
+                      blurRadius: isFeatured ? 18 : 14,
                       offset: const Offset(0, 4),
                     ),
                   ]
-                : null,
+                : isFeatured
+                    ? [
+                        BoxShadow(
+                          color: spec.headerFrame.withValues(alpha: 0.12),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ]
+                    : null,
           ),
           child: Column(
             children: [
-              Container(
-                height: 54,
-                decoration: BoxDecoration(
-                  color: spec.pageBackground,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: spec.verseText.withValues(alpha: 0.08),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    height: 54,
+                    decoration: BoxDecoration(
+                      color: spec.pageBackground,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: spec.verseText.withValues(alpha: 0.08),
+                      ),
+                      boxShadow: isFeatured
+                          ? [
+                              BoxShadow(
+                                color: spec.headerFrame.withValues(alpha: 0.16),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ]
+                          : null,
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'بِسْمِ اللَّهِ',
+                      style: GoogleFonts.notoNaskhArabic(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: spec.basmala,
+                      ),
+                    ),
                   ),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  'بِسْمِ اللَّهِ',
-                  style: GoogleFonts.notoNaskhArabic(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: spec.basmala,
-                  ),
-                ),
+                  if (isFeatured)
+                    Positioned(
+                      top: -8,
+                      right: -4,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 7,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              spec.headerFrame,
+                              spec.verseNumber,
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: spec.headerFrame.withValues(alpha: 0.28),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          'مميز',
+                          style: GoogleFonts.tajawal(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                            color: spec.pageBackground,
+                            height: 1.1,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
               const SizedBox(height: 10),
               Row(
                 children: [
-                  Container(
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      color: spec.swatch,
-                      shape: BoxShape.circle,
+                  if (isFeatured) ...[
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [spec.headerFrame, spec.verseNumber],
+                        ),
+                        shape: BoxShape.circle,
+                      ),
                     ),
-                  ),
+                  ] else
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: spec.swatch,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
