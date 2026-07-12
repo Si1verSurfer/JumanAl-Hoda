@@ -1,50 +1,33 @@
-# جُمانُ الهُدَى — Website
+## Deploy on Vercel (required settings)
 
-Landing page and legal pages for the **جُمانُ الهُدَى** iOS app.
+### 1. Import the repo
+Import **Si1verSurfer/JumanAl-Hoda** on Vercel.
 
-## Deploy on Vercel
+### 2. Set Root Directory — IMPORTANT
+In **Project Settings → General → Root Directory**, set:
 
-### Option A — Deploy from repo root (recommended)
-
-The repo includes a root `vercel.json` that builds the `website/` folder automatically.
-Import **Si1verSurfer/JumanAl-Hoda** in Vercel and deploy with default settings.
-
-### Option B — Deploy only the website folder
-
-1. In Vercel project settings, set **Root Directory** to `website`.
-2. Keep:
-   - **Build Command:** `npm run build`
-   - **Output Directory:** `dist`
-
-### After deploy
-
-Add your custom domain: `jumanahjumanalhoda.com`
-
-If you see `404: NOT_FOUND`, redeploy after pulling the latest `main` branch.
-
-## Local development
-
-```bash
-cd website
-npm install
-npm run dev
+```
+website
 ```
 
-Open http://localhost:5173
+Click **Save**, then redeploy.
 
-## Production build
+### 3. Build settings (should auto-fill from `vercel.json`)
+| Setting | Value |
+|---------|-------|
+| Framework Preset | Vite |
+| Build Command | `npm run build` |
+| Output Directory | `dist` |
+| Install Command | `npm install` |
+| Node.js Version | 22.x |
 
-```bash
-npm run build
-npm run preview
-```
+### 4. Clear overrides
+In **Settings → Build & Deployment**, remove any **Production Overrides** for Output Directory or Build Command if they exist.
 
-## Routes
+### 5. Custom domain
+Add `jumanahjumanalhoda.com` under **Domains**.
 
-| Path | Page |
-|------|------|
-| `/` | Landing page |
-| `/privacy` | Privacy policy |
-| `/terms` | Terms & conditions |
-
-The Flutter app loads legal pages from the deployed site with `?embed=1`.
+### Troubleshooting
+- `404 NOT_FOUND` → Root Directory is not set to `website`
+- `Deployment failed` → Check build logs; ensure Node 22 and Root Directory = `website`
+- After changing Root Directory, click **Redeploy** on the latest deployment

@@ -1,0 +1,8 @@
+{
+  "name": "juman-alhoda-repo",
+  "private": true,
+  "description": "Monorepo root — website deploys from the website/ folder on Vercel.",
+  "scripts": {
+    "build:website": "npm run build --prefix website"
+  }
+}
