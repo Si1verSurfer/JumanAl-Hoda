@@ -28,14 +28,20 @@ npm run dev
 npm run build
 ```
 
-## Vercel
+## Vercel deploy
 
 | Setting | Value |
 |---------|--------|
-| Preset | **Vite** |
-| Build | `npm run build` |
-| Output | `dist` |
-| Node | 22.x |
+| **Application Preset** | **Vite** |
+| **Root Directory** | *(leave empty)* |
+| **Build Command** | `npm run build` |
+| **Output Directory** | `dist` |
+| **Install Command** | `npm ci` |
+| **Node.js Version** | **22.x** |
+
+**Important:** Remove any Production Overrides in Build settings, then redeploy.
+
+`vercel.json` is already configured for SPA routing (`/privacy`, `/terms`).
 
 ## Routes
 
