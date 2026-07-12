@@ -23,8 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 
-# Local only (never commit)
-mobile/
+# Local monorepo layout (device only — not pushed to GitHub)
+app/
+web/
+
+# Flutter build artifacts (if any leak outside app/)
 .dart_tool/
 .flutter-plugins-dependencies
 build/
