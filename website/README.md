@@ -1,16 +1,32 @@
+# جُمانُ الهُدَى — Website
+
+Landing page and legal pages for the iOS app.
+
+## Local development
+
+```bash
+npm install
+npm run dev
+```
+
+Open http://localhost:5173
+
 ## Deploy on Vercel
 
-See **[../DEPLOY.md](../DEPLOY.md)** in the repo root for the full troubleshooting guide.
-
-### If Root Directory = `website`
-
 | Setting | Value |
-|---------|-------|
-| Framework | Vite |
-| Build Command | `npm run build` |
-| Output Directory | `dist` |
-| Node.js | 22.x |
+|---------|--------|
+| **Application Preset** | **Vite** |
+| **Root Directory** | `website` |
+| **Build Command** | `npm run build` |
+| **Output Directory** | `dist` |
+| **Node.js** | 22.x |
 
-### If Root Directory is empty (repo root)
+Remove any **Production Overrides** in Build settings, then redeploy.
 
-Leave dashboard build settings blank — root `vercel.json` handles everything.
+## Routes
+
+- `/` — Landing page
+- `/privacy` — Privacy policy
+- `/terms` — Terms & conditions
+
+The iOS app loads `/privacy?embed=1` and `/terms?embed=1` from the deployed site.

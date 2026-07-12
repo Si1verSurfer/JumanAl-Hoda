@@ -1,14 +1,34 @@
-# goman_alhoda
+# جُمانُ الهُدَى
 
-Goman Al-Hoda — Flutter Islamic companion app (Arabic RTL).
+This repository contains the **website only** (landing page + legal pages).
 
-## Setup
+The Flutter iOS app lives locally in `mobile/` and is **not** pushed to GitHub.
 
-After cloning, install the large Quran mushaf assets (fonts + text data, ~55 MB):
+## Website (deployed on Vercel)
 
 ```bash
-./scripts/fetch_quran_assets.sh
-flutter pub get
+cd website
+npm install
+npm run dev
 ```
 
-Then run the app as usual with `flutter run`.
+### Vercel settings
+
+| Setting | Value |
+|---------|--------|
+| **Application Preset** | Vite |
+| **Root Directory** | `website` |
+| **Build Command** | `npm run build` |
+| **Output Directory** | `dist` |
+| **Node.js** | 22.x |
+
+## Mobile app (local only)
+
+```bash
+cd mobile
+flutter pub get
+./scripts/fetch_quran_assets.sh   # first time
+flutter run
+```
+
+The `mobile/` folder is gitignored. Keep your own backup or a separate private repo for the app.
