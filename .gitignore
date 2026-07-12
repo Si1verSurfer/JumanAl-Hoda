@@ -25,7 +25,6 @@ dist-ssr
 
 # Flutter mobile app — local only (not on GitHub)
 app/
-web/
 
 # Flutter build artifacts (if any leak outside app/)
 .dart_tool/
