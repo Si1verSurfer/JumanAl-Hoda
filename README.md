@@ -1,47 +1,58 @@
-# جُمانُ الهُدَى — Local project layout
+# جُمانُ الهُدَى
 
-This folder is organized for **local development on your device only**. The `app/` and `web/` directories are gitignored and are not pushed to GitHub.
+Landing page — React + Vite + TypeScript + Tailwind.
+
+The Flutter mobile app lives locally in `app/` (gitignored, not pushed to GitHub).
 
 ## Structure
 
 ```
-goman_alhoda/
-├── app/          # Flutter mobile app (iOS & Android)
-│   ├── lib/
-│   ├── android/
-│   ├── ios/
-│   ├── assets/
-│   ├── packages/
-│   └── pubspec.yaml
-└── web/          # React landing site (Vite + Tailwind)
-    ├── src/
-    ├── public/
-    └── package.json
+├── public/
+├── src/
+│   ├── components/
+│   ├── pages/
+│   ├── data/
+│   ├── config/
+│   ├── App.tsx
+│   ├── main.tsx
+│   └── index.css
+├── index.html
+├── vite.config.ts
+├── vercel.json
+└── package.json
 ```
 
-## Mobile app — legal documents
-
-Privacy policy and terms & conditions are included in the app under **Settings → Legal**, using the same Arabic content as the website (`web/src/data/legal.ts` ↔ `app/lib/features/settings/data/legal_documents.dart`).
-
-## Run the website
+## Scripts
 
 ```bash
-cd web
 npm install
 npm run dev
+npm run build
 ```
 
-Routes: `/` (landing), `/privacy`, `/terms`
+## Vercel deploy
 
-## Run the mobile app
+| Setting | Value |
+|---------|--------|
+| **Application Preset** | **Vite** |
+| **Root Directory** | *(leave empty)* |
+| **Build Command** | `npm run build` |
+| **Output Directory** | `dist` |
+| **Install Command** | `npm ci` |
+| **Node.js Version** | **22.x** |
+
+`vercel.json` is configured for SPA routing (`/privacy`, `/terms`).
+
+## Routes
+
+- `/` — Landing
+- `/privacy` — سياسة الخصوصية
+- `/terms` — الشروط والأحكام
+
+## Local mobile app
 
 ```bash
 cd app
 flutter pub get
 flutter run
 ```
-
-## Notes
-
-- GitHub tracks only the root README and `.gitignore` for this local layout.
-- Restore or update the Flutter app from local backups if needed; full source lives in `app/`.

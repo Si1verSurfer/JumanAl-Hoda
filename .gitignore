@@ -23,7 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
-# Local monorepo layout (device only — not pushed to GitHub)
+# Flutter mobile app — local only (not on GitHub)
 app/
 web/
 
