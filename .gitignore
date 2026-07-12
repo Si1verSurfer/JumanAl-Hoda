@@ -23,12 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 
-# Flutter mobile app (local only)
+# Local only (never commit)
 mobile/
 .dart_tool/
 .flutter-plugins-dependencies
-.pub-cache/
-.pub/
 build/
-coverage/
 custom_lint.log
