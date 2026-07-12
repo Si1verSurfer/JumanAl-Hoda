@@ -18,6 +18,9 @@ export function Footer() {
         </div>
 
         <nav className="flex flex-col gap-2 text-sm text-paper/75">
+          <Link to="/support" className="font-semibold transition-colors hover:text-paper">
+            مركز الدعم
+          </Link>
           <Link to="/privacy" className="font-semibold transition-colors hover:text-paper">
             سياسة الخصوصية
           </Link>

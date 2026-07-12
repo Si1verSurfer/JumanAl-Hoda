@@ -2,10 +2,15 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { APP_NAME } from '../data/content';
 
-const links = [
-  { href: '#features', label: 'المميزات' },
-  { href: '#screens', label: 'لقطات التطبيق' },
-  { href: '#download', label: 'التحميل' },
+type NavLink =
+  | { type: 'anchor'; href: string; label: string }
+  | { type: 'route'; to: string; label: string };
+
+const links: NavLink[] = [
+  { type: 'anchor', href: '#features', label: 'المميزات' },
+  { type: 'anchor', href: '#screens', label: 'لقطات التطبيق' },
+  { type: 'anchor', href: '#download', label: 'التحميل' },
+  { type: 'route', to: '/support', label: 'الدعم' },
 ];
 
 export function Navbar() {
@@ -29,15 +34,25 @@ export function Navbar() {
         </Link>
 
         <div className="hidden items-center gap-8 md:flex">
-          {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="text-sm font-semibold text-primary/65 transition-colors hover:text-secondary"
-            >
-              {link.label}
-            </a>
-          ))}
+          {links.map((link) =>
+            link.type === 'route' ? (
+              <Link
+                key={link.to}
+                to={link.to}
+                className="text-sm font-semibold text-primary/65 transition-colors hover:text-secondary"
+              >
+                {link.label}
+              </Link>
+            ) : (
+              <a
+                key={link.href}
+                href={link.href}
+                className="text-sm font-semibold text-primary/65 transition-colors hover:text-secondary"
+              >
+                {link.label}
+              </a>
+            ),
+          )}
         </div>
 
         <motion.a

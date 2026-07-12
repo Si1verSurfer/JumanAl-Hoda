@@ -3,6 +3,7 @@ import { ScrollToTop } from './components/ScrollToTop';
 import { HomePage } from './pages/HomePage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { PrivacyPage } from './pages/PrivacyPage';
+import { SupportPage } from './pages/SupportPage';
 import { TermsPage } from './pages/TermsPage';
 
 export default function App() {
@@ -18,6 +19,8 @@ export default function App() {
           path="/terms-and-conditions"
           element={<Navigate to="/terms" replace />}
         />
+        <Route path="/support" element={<SupportPage />} />
+        <Route path="/help" element={<Navigate to="/support" replace />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
