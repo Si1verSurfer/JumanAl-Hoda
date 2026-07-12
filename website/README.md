@@ -4,17 +4,23 @@ Landing page and legal pages for the **جُمانُ الهُدَى** iOS app.
 
 ## Deploy on Vercel
 
-1. Push this repository to GitHub.
-2. In [Vercel](https://vercel.com), create a **New Project** and import the repo.
-3. Set **Root Directory** to `website`.
-4. Vercel auto-detects **Vite** — keep these settings:
+### Option A — Deploy from repo root (recommended)
+
+The repo includes a root `vercel.json` that builds the `website/` folder automatically.
+Import **Si1verSurfer/JumanAl-Hoda** in Vercel and deploy with default settings.
+
+### Option B — Deploy only the website folder
+
+1. In Vercel project settings, set **Root Directory** to `website`.
+2. Keep:
    - **Build Command:** `npm run build`
    - **Output Directory:** `dist`
-   - **Install Command:** `npm install`
-5. Add your custom domain: `jumanahjumanalhoda.com`
-6. Deploy.
 
-`vercel.json` is already configured for SPA routing (`/privacy`, `/terms`, etc.).
+### After deploy
+
+Add your custom domain: `jumanahjumanalhoda.com`
+
+If you see `404: NOT_FOUND`, redeploy after pulling the latest `main` branch.
 
 ## Local development
 

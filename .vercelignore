@@ -1,0 +1,10 @@
+.dart_tool
+.flutter-plugins-dependencies
+.pub
+build
+android
+ios
+packages/quran_package/qcf_quran/assets/fonts
+packages/quran_package/qcf_quran/lib/src/data/quran_text.dart
+website/node_modules
+website/dist
