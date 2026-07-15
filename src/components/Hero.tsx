@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { APP_STORE_URL } from '../config/site';
 import { APP_NAME, APP_SPLASH, APP_TAGLINE } from '../data/content';
 import { MockupCarousel } from './MockupCarousel';
 import { FloatingOrbs } from './FloatingOrbs';
@@ -66,13 +67,15 @@ export function Hero() {
             className="mt-10 flex flex-wrap items-center justify-center gap-4 lg:justify-start"
           >
             <motion.a
-              href="#download"
+              href={APP_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               whileHover={{ scale: 1.04, y: -2 }}
               whileTap={{ scale: 0.97 }}
               className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-l from-secondary to-[#4a1520] px-8 py-4 text-base font-bold text-paper shadow-xl shadow-secondary/30"
             >
               <AppleIcon />
-              App Store
+              حمّل من App Store
             </motion.a>
             <motion.a
               href="#features"

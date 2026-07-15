@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { APP_STORE_URL } from '../config/site';
 import { APP_NAME } from '../data/content';
 
 type NavLink =
@@ -56,7 +57,9 @@ export function Navbar() {
         </div>
 
         <motion.a
-          href="#download"
+          href={APP_STORE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
           whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.97 }}
           className="rounded-xl bg-gradient-to-l from-secondary to-[#4a1520] px-5 py-2.5 text-sm font-bold text-paper shadow-lg shadow-secondary/25"
